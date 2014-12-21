@@ -10,14 +10,12 @@
 </head>
 <body>
 <div id="overlay">
-    
     <div id="add-preco" style="margin-top: 25px;">
         <ul id="PRECO" style="text-align: left;" class="item-edit entity" data-RECURSO_ID="">
             <li class="attribute">
                 <label style="width: 80px;" for="PRECO-RECURSO_ID">RECURSO</label>
                 <input type="text" id="PRECO-RECURSO_ID" value="" disabled></input>
             </li>
-
             <li class="attribute">
                 <label style="width: 80px;" for="F1">FORNECEDOR</label>
                 <input id="F1" value="" disabled placeholder="Fornecedor"></input>
@@ -32,16 +30,13 @@
             </li>
         </ul>
         <ul class="related-items" style="padding: 7px;">
-            <button class="ok" onclick="$('#ok-add-preco').click();">APLICAR</button><button class="cancel" onclick="$('#cancel-add-preco').click();">CANCELAR</button>
+            <button class="ok" onclick="$('#ok-add-preco').click();">APLICAR</button>
+            <button class="cancel" onclick="$('#cancel-add-preco').click();">CANCELAR</button>
         </ul>
     </div>
-
-
 </div>
 <div id="body"><div id="fichas"></div></div>
-<!--
-<iframe src="https://embed.spotify.com/?uri=spotify:user:ipsilonpublico:playlist:1Cq1tofwRPGRWGy8PNkkor" frameborder="0" allowtransparency="true" width="300" height="380"></iframe>
--->
+
 <script id="rows-template" type="text/template">
 <ul class="<%= classe %>">
 <% _.each(items, function(item){ %>
@@ -58,14 +53,10 @@
 </ul>
 </script>
 
-
-
 <script id="input-template" type="text/template">
     <label for="<%= attribute.name %>"><%= item.name %></label>
     <input id="<%= attribute.name %>" value="<%= attribute.value %>"></input>
 </script>
-
-
 
 <script id="unidade_option" type="text/template">
 <% _.each(items, function(item){ %>
@@ -73,23 +64,23 @@
 <% }) %>
 </script>
 
-
-
 <script id="tipo_option" type="text/template">
 <% _.each(items, function(item){ %>
 <option title="<%= item.TIPO_NOME %>" value="<%= item.TIPO_CODIGO %>"><%= item.TIPO_CODIGO %></option>
 <% }) %>
 </script>
 
-
-
-<!-- TEMPLATE : RECURSO -->
 <script id="recurso" type="text/template">
 <div id ="Recursos" style="display:none;" class="container">
 
-
-
-<ul id="RECURSO" class="item-edit entity" data-RECURSO_ID data-NOME data-TIPO_CODIGO data-UNIDADE_CODIGO data-RECURSO_PRECO data-DATA_ATUALIZADO data-USER>
+<ul id="RECURSO" class="item-edit entity"
+        data-RECURSO_ID
+        data-NOME
+        data-TIPO_CODIGO
+        data-UNIDADE_CODIGO
+        data-RECURSO_PRECO
+        data-DATA_ATUALIZADO
+        data-USER>
     <% _.each(items, function(item){ %>
     <li class="attribute">
     <label for="R_ID">ID</label>
@@ -130,10 +121,17 @@
 <!-- TEMPLATE : RECURSO-PRECO-template -->
 <script id="RECURSO-PRECO-template" type="text/template">
 <% _.each(precos, function(preco){ %>
-    <li class="PRECO" data-DATA="<%= preco.DATA %>" data-RECURSO_ID="<%= preco.RECURSO_ID %>" data-VALOR="<%= preco.VALOR %>" data-FORNECEDOR_ID="<%= preco.FORNECEDOR_ID %>" style="margin: 3px 5px; box-shadow: 0 0 4px 0px rgba(0,0,0,.25);">
+    <li class="PRECO"
+        data-DATA="<%= preco.DATA %>"
+        data-RECURSO_ID="<%= preco.RECURSO_ID %>"
+        data-VALOR="<%= preco.VALOR %>"
+        data-FORNECEDOR_ID="<%= preco.FORNECEDOR_ID %>" style="margin: 3px 5px; box-shadow: 0 0 4px 0px rgba(0,0,0,.25);">
     
     <div style="text-align:left;">
-        <input onchange="Frontgate.Apps('Fichas').clickedRadio(this);" type="radio" id="<%= preco.id %>" name="preco" style="vertical-align: middle; margin-right: 4px;">
+        <input onchange="Frontgate.Apps('Fichas').clickedRadio(this);"
+            type="radio" id="<%= preco.id %>"
+            name="preco"
+            style="vertical-align: middle; margin-right: 4px;">
         <span style="vertical-align: middle;font-size: 90%; "><%= preco.fornecedor %> <%= preco.DATA %></span>
         <img src="icons/16/close.png" class="eliminar" title="Eliminar">
     </div>
@@ -182,9 +180,6 @@
 </div>
 </div>
 </script>
-
-<script id="recursos" type="text/template"></script>
-
 <script type="text/javascript" src="script.js"></script>
 </body>
 </html>
