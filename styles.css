@@ -1,0 +1,319 @@
+
+body {
+    background-color: rgba(0,0,0,.5);/* rgb(245, 245, 245); */
+}
+
+#overlay {
+    display: none;
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    background-color: rgba(0,0,0,0.5);
+    vertical-align: middle;
+}
+
+#add-preco {
+    vertical-align: middle;
+    padding: 0px;
+    box-shadow: 0 0 6px 3px rgba(0,0,0,.25);
+    background-color: white;
+    border: solid 1px rgba(0,0,0,.5);
+    display: inline-block;
+}
+
+#body, div.container {
+    width: 840px;
+}
+
+#body {
+     margin: auto;
+     background-color: white;
+     box-shadow: 0 0 6px 3px rgba(0,0,0,.25);
+     display: block;
+}
+
+div.container {
+    /* não mostrar inicialmente */
+    display: none;
+}
+
+#fichas {
+    /*
+    cursor: ns-resize;
+    */
+}
+
+#user {
+    /*color: #27C243;*/
+    color: rgba(0,0,0,.7);
+}
+
+li.bar-item.selected a, li.bar-item.selected a:hover{
+    color: #5ECDF2;
+}
+
+ul.related-items button {
+    margin: 10px;
+    padding: 4px 8px;
+    color: rgba(0,0,0,.75);
+}
+
+button.ok, button.cancel {
+    border: solid rgba(0,0,0,.1) 2px;
+    border-radius: 3px;"
+    background-color: rgba(0,0,0,.05);
+    box-shadow: 0 0 6px 2px rgba(255,255,255,.25);
+}
+button.ok:hover, button.cancel:hover {
+    background-color: rgba(0,0,0,.1);
+    cursor: pointer;
+    
+}
+
+button.ok:hover {
+    border-color: green;
+}
+button.cancel:hover {
+    border-color: red;
+}
+
+/*-----------------------------
+       RECURSO-PRECO
+-----------------------------*/
+#PRECO-mosaicos {
+    display: inline-block;
+   /* border: solid 1px rgba(0,0,0,.1);
+    margin: 15px;*/
+}
+
+li.PRECO img {
+    opacity: 0;
+    vertical-align: middle;
+    /*
+    background-color: rgba(255,0,255,.1);
+    */
+    width: 16px;
+    height: 16px;
+    padding: 3px;
+    margin-right: -8px;
+    margin-top: -6px;
+    margin-left: 5px;
+    cursor: pointer;
+    transition: opacity 0.25s linear;
+}
+li.PRECO:hover img {
+    opacity: 1;
+} 
+
+ul.item-edit, ul.related-items, ul.table {
+    vertical-align: top;
+    color: black; 
+    padding: 30px; 
+    margin: 15px;
+    font-size: 110%;
+    list-style-type: none;
+    border: solid 1px rgba(0,0,0,.1);
+
+    background-color: rgba(0,0,0,.05);
+
+    display: inline-block;
+    /*
+    visibility: hidden;
+    */
+    padding: 10px;
+}
+
+li.PRECO {
+    background-color: white;
+}
+
+ul.item-edit li {
+    padding: 1px 3px;
+    margin: 2px;
+}
+
+ul.item-edit label {
+    width: 60px;
+    display: inline-block;
+    text-align: right;
+    margin: 2px;
+}
+
+ul.item-edit input, ul.item-edit select {
+    margin: 3px;
+    padding: 3px 6px;
+    border: default;
+}
+
+ul.related-items li {
+    color: rgba(0, 0, 0, .66);
+    border: solid 1px rgba(0,0,0,.25);
+    padding: 2px 8px;
+    text-align: center;
+}
+
+ul.related-items {
+    padding: 0;
+}
+
+/*-------------
+    TABLES
+-------------*/
+ul.table {
+    display: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+ul.table.selected {
+    display: block;
+    text-align: left;
+}
+ul.table.body {
+    overflow-y: auto;
+    max-height: 275px;
+}
+ul.table.header {
+    background-color: gray;
+    border-bottom: solid 1px rgba(0,0,0,.15);
+    border-top: solid 1px rgba(0,0,0,.05);
+}
+li.table.header li, ul.row li {
+    color: rgba(0,0,0,.75);
+    font-weight: bold;
+    cursor: default;
+}
+ul.table.header ul.row {
+    color: rgba(0,0,0,.75);
+    font-weight: bold;
+    cursor: default;
+    border: none;
+    background-color: #DEDEDE;
+}
+/* linhas */
+ul.table.body ul.row {
+    display: inline-block;
+    text-align: left;
+    border-bottom: solid 1px;
+    border-color: rgba(0,0,0,.15);
+    background-color: white;
+}
+ul.table.body ul.row:hover {
+    background-color: #FCFFD9;
+}
+ul.table.body ul.row.selected {
+    background-color: rgba(0,0,0,.05);
+}
+
+#RECURSO[data-recurso_id=""] {
+    border: solid 1px orange;
+}
+
+/* table rows */
+ul.table > li {
+    display: block;
+    text-align: left;
+    padding: 0;
+    margin: 0;
+    border: none;
+}
+/* row fields (columns) */
+ul.row li {padding: 2px 2px 2px 8px;
+    display: inline-block;
+    text-align: left;
+    font-family: consolas, monospace;
+    margin: 0;
+    border: none;
+    border-right: solid 1px;
+    border-color: rgba(0,0,0,.15);
+}
+
+#RECURSO > div {
+    box-shadow: 0 0 4px 0px rgba(0,0,0,.25);
+}
+
+/*
+input[type="radio"] {
+    display:none;
+}
+input[type="radio"] + label span {
+    display:inline-block;
+    width:20px;
+    height:20px;
+    margin:-1px 4px 0 0;
+    vertical-align:middle;
+    background: url(images/sprite_radio_checkboxes_enabled.png) -40px top no-repeat;
+    cursor:pointer;
+}
+input[type="radio"]:checked + label span {
+    background:url(images/sprite_radio_checkboxes_enabled.png) -60px top no-repeat;
+}
+input[type="radio"][disabled] + label span {
+    display:inline-block;
+    width:19px;
+       height:19px;
+    margin:-1px 4px 0 0;
+    vertical-align:middle;
+    background: url(images/sprite_radio_checkboxes_disabled.png) -40px top no-repeat;
+    cursor:default;
+}
+
+input[type="radio"][disabled]:checked + label span {
+       background:url(images/sprite_radio_checkboxes_disabled.png) -60px top no-repeat;
+cursor:default;
+}
+*/
+
+label[disabled] {
+    cursor:default;
+}
+
+input[disabled] {
+    cursor:default;
+}
+
+/*------------
+     Bar
+------------*/
+
+div.navigator li.bar-item img {
+    vertical-align: middle;
+    opacity: .75;
+}
+
+div.navigator li.bar-item a {
+    color: rgba(0,0,0,.8);
+}
+div.navigator li.bar-item.selected a {
+    text-decoration: underline;
+    color: rgba(0,0,0,.7);
+    font-weight: bold;
+}
+
+div.navigator li.bar-item.selected a:hover {
+    color: rgba(0,0,0,.7);
+}
+
+div.navigator li.bar-item > a:hover {
+    text-decoration: underline;
+    color: rgba(0,0,0,.7);
+    text-shadow: 0 0 5px rgb(255,255,255);
+}
+
+li.bar-item.selected {
+    text-decoration: underline;
+}
+
+#fichas {
+    background-color: #DEDEDE;
+    border-bottom: solid 1px rgba(0,0,0,.5);
+}
+
+#fichas > div.bar > ul a {
+    color: rgba(0,0,0,.5);
+    text-shadow: 0 0 5px rgb(255,255,255);
+    font-size: 200%;
+    font-weight: 900;
+}

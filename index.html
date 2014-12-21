@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Fichas de Rendimento</title>
+<script type="text/javascript" src="https://situs.pt/lib/jquery"></script>
+<link rel="stylesheet" type="text/css" href="https://situs.pt/bar/css">
+<link rel="stylesheet" type="text/css" href="https://situs.pt/frontgate/css">
+<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+<div id="overlay">
+    
+    <div id="add-preco" style="margin-top: 25px;">
+        <ul id="PRECO" style="text-align: left;" class="item-edit entity" data-RECURSO_ID="">
+            <li class="attribute">
+                <label style="width: 80px;" for="PRECO-RECURSO_ID">RECURSO</label>
+                <input type="text" id="PRECO-RECURSO_ID" value="" disabled></input>
+            </li>
+
+            <li class="attribute">
+                <label style="width: 80px;" for="F1">FORNECEDOR</label>
+                <input id="F1" value="" disabled placeholder="Fornecedor"></input>
+            </li>
+            <li class="attribute">
+                <label style="width: 80px;" for="V1">PREÇO</label>
+                <input type="text" id="V1" value="" placeholder="Preço"></input>
+            </li>
+            <li class="attribute">
+                <label style="width: 80px;" for="D1">DATA</label>
+                <input type="date" id="D1" value=""></input>
+            </li>
+        </ul>
+        <ul class="related-items" style="padding: 7px;">
+            <button class="ok" onclick="$('#ok-add-preco').click();">APLICAR</button><button class="cancel" onclick="$('#cancel-add-preco').click();">CANCELAR</button>
+        </ul>
+    </div>
+
+
+</div>
+<div id="body"><div id="fichas"></div></div>
+<!--
+<iframe src="https://embed.spotify.com/?uri=spotify:user:ipsilonpublico:playlist:1Cq1tofwRPGRWGy8PNkkor" frameborder="0" allowtransparency="true" width="300" height="380"></iframe>
+-->
+<script id="rows-template" type="text/template">
+<ul class="<%= classe %>">
+<% _.each(items, function(item){ %>
+<li><%= item.data %></li>
+<% }) %>
+</ul>
+</script>
+
+<script id="row-template" type="text/template">
+<ul class="row">
+<% _.each(items, function(item){ %>
+    <li class="<%= item.class %>"><%= item.value %></li>
+<% }) %>
+</ul>
+</script>
+
+
+
+<script id="input-template" type="text/template">
+    <label for="<%= attribute.name %>"><%= item.name %></label>
+    <input id="<%= attribute.name %>" value="<%= attribute.value %>"></input>
+</script>
+
+
+
+<script id="unidade_option" type="text/template">
+<% _.each(items, function(item){ %>
+<option title="<%= item.UNIDADE_NOME %>" value="<%= item.UNIDADE_CODIGO %>"><%= item.UNIDADE_CODIGO %></option>
+<% }) %>
+</script>
+
+
+
+<script id="tipo_option" type="text/template">
+<% _.each(items, function(item){ %>
+<option title="<%= item.TIPO_NOME %>" value="<%= item.TIPO_CODIGO %>"><%= item.TIPO_CODIGO %></option>
+<% }) %>
+</script>
+
+
+
+<!-- TEMPLATE : RECURSO -->
+<script id="recurso" type="text/template">
+<div id ="Recursos" style="display:none;" class="container">
+
+
+
+<ul id="RECURSO" class="item-edit entity" data-RECURSO_ID data-NOME data-TIPO_CODIGO data-UNIDADE_CODIGO data-RECURSO_PRECO data-DATA_ATUALIZADO data-USER>
+    <% _.each(items, function(item){ %>
+    <li class="attribute">
+    <label for="R_ID">ID</label>
+    <input type="text" id="RECURSO_ID" value="<%= item.RECURSO_ID %>"></input>
+    </li>
+    <li class="attribute">
+    <label for="NOME">NOME</label>
+    <input type="text" id="NOME" value="<%= item.NOME %>"></input>
+    </li>
+    <li class="attribute">
+    <label for="TIPO_CODIGO">TIPO</label>
+    <select id="TIPO_CODIGO" value="<%= item.TIPO_CODIGO %>"></select>
+    </li>
+    <li class="attribute">
+    <label for="UNIDADE_CODIGO">UNIDADE</label>
+    <select id="UNIDADE_CODIGO" value="<%= item.UNIDADE_CODIGO %>"></select>
+    </li>
+    <li class="attribute">
+    <label for="RECURSO_PRECO">PREÇO</label>
+    <input type="text" id="RECURSO_PRECO" value="<%= item.RECURSO_PRECO %>"></input>
+    </li>
+    <li class="attribute">
+    <label for="DATA_ATUALIZADO">DATA</label>
+    <input type="date" id="DATA_ATUALIZADO" value="<%= item.DATA_ATUALIZADO %>"></input>
+    </li>
+    <li class="attribute">
+    <label for="USER">USER</label>
+    <input type="text" id="USER" value="<%= item.USER %>"></input>
+    </li>
+    <% }) %>
+</ul>
+<div id="PRECO-mosaicos">
+    <ul class="related-items" style="padding: 7px;"></ul>
+</div>
+</div>
+</script>
+
+<!-- TEMPLATE : RECURSO-PRECO-template -->
+<script id="RECURSO-PRECO-template" type="text/template">
+<% _.each(precos, function(preco){ %>
+    <li class="PRECO" data-DATA="<%= preco.DATA %>" data-RECURSO_ID="<%= preco.RECURSO_ID %>" data-VALOR="<%= preco.VALOR %>" data-FORNECEDOR_ID="<%= preco.FORNECEDOR_ID %>" style="margin: 3px 5px; box-shadow: 0 0 4px 0px rgba(0,0,0,.25);">
+    
+    <div style="text-align:left;">
+        <input onchange="Frontgate.Apps('Fichas').clickedRadio(this);" type="radio" id="<%= preco.id %>" name="preco" style="vertical-align: middle; margin-right: 4px;">
+        <span style="vertical-align: middle;font-size: 90%; "><%= preco.fornecedor %> <%= preco.DATA %></span>
+        <img src="icons/16/close.png" class="eliminar" title="Eliminar">
+    </div>
+    
+    <label style="display: block; font-family: monospace; font-size: 18px; font-weight: bold; padding 5px; margin: 0px 5px 5px 5px;"  for="<%= preco.id %>">
+    <span></span><%= preco.VALOR %> €
+    </label>
+    </li>
+<% }) %>
+</script>
+
+<!-- TEMPLATE : FORNECEDORES -->
+<script id="fornecedores" type="text/template">
+<div id="Fornecedores" style="display:none;" class="container">
+
+<ul id="FORNCEDOR" class="item-edit">
+    <% _.each(items, function(item){ %>
+    <li>
+    <label for="FORNECEDOR_ID">ID</label>
+    <input type="text" id="FORNECEDOR_ID" value="<%= item.FORNECEDOR_ID %>" placeholder="#"></input>
+    </li>
+    <li>
+    <label for="FORNECEDOR_NOME">NOME</label>
+    <input type="text" id="FORNECEDOR_NOME" value="<%= item.FORNECEDOR_NOME %>" placeholder="Nome"></input>
+    </li>
+    <li>
+    <label for="FORNECEDOR_MORADA">MORADA</label>
+    <input type="text" id="FORNECEDOR_MORADA" value="<%= item.FORNECEDOR_MORADA %>" placeholder="Morada"></input>
+    </li>
+    <% }) %>
+</ul>
+
+<ul id="CONTACTO" class="related-items">
+    <li>Adicionar Contacto</li>
+<% _.each(contactos, function(contacto){ %>
+    <li><%= contacto.dummy %></li>
+<% }) %>
+    
+</ul>
+<div style="max-height: 800px; overflow: auto;" >
+<ul id="FORNECEDORES" class="items-list">
+<% _.each(fornecedores, function(fornecedor){ %>
+    <li><%= fornecedor.dummy %></li>
+<% }) %>
+</ul>
+</div>
+</div>
+</script>
+
+<script id="recursos" type="text/template"></script>
+
+<script type="text/javascript" src="script.js"></script>
+</body>
+</html>
