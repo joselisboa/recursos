@@ -9,6 +9,7 @@
 <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
+<div id="body"></div>
 <div id="overlay">
     <div id="add-preco" style="margin-top: 25px;">
         <ul id="PRECO" style="text-align: left;" class="item-edit entity" data-RECURSO_ID="">
@@ -35,8 +36,6 @@
         </ul>
     </div>
 </div>
-<div id="body"><div id="fichas"></div></div>
-
 <script id="rows-template" type="text/template">
 <ul class="<%= classe %>">
 <% _.each(items, function(item){ %>
@@ -70,17 +69,9 @@
 <% }) %>
 </script>
 
+<!-- TEMPLATE#recurso -->
 <script id="recurso" type="text/template">
-<div id ="Recursos" style="display:none;" class="container">
-
-<ul id="RECURSO" class="item-edit entity"
-        data-RECURSO_ID
-        data-NOME
-        data-TIPO_CODIGO
-        data-UNIDADE_CODIGO
-        data-RECURSO_PRECO
-        data-DATA_ATUALIZADO
-        data-USER>
+<ul id="RECURSO" class="item-edit entity" data-RECURSO_ID data-NOME data-TIPO_CODIGO data-UNIDADE_CODIGO data-RECURSO_PRECO data-DATA_ATUALIZADO data-USER>
     <% _.each(items, function(item){ %>
     <li class="attribute">
     <label for="R_ID">ID</label>
@@ -115,10 +106,9 @@
 <div id="PRECO-mosaicos">
     <ul class="related-items" style="padding: 7px;"></ul>
 </div>
-</div>
 </script>
 
-<!-- TEMPLATE : RECURSO-PRECO-template -->
+<!-- TEMPLATE#RECURSO-PRECO-template -->
 <script id="RECURSO-PRECO-template" type="text/template">
 <% _.each(precos, function(preco){ %>
     <li class="PRECO"
@@ -126,7 +116,6 @@
         data-RECURSO_ID="<%= preco.RECURSO_ID %>"
         data-VALOR="<%= preco.VALOR %>"
         data-FORNECEDOR_ID="<%= preco.FORNECEDOR_ID %>" style="margin: 3px 5px; box-shadow: 0 0 4px 0px rgba(0,0,0,.25);">
-    
     <div style="text-align:left;">
         <input onchange="Frontgate.Apps('Fichas').clickedRadio(this);"
             type="radio" id="<%= preco.id %>"
@@ -135,7 +124,6 @@
         <span style="vertical-align: middle;font-size: 90%; "><%= preco.fornecedor %> <%= preco.DATA %></span>
         <img src="icons/16/close.png" class="eliminar" title="Eliminar">
     </div>
-    
     <label style="display: block; font-family: monospace; font-size: 18px; font-weight: bold; padding 5px; margin: 0px 5px 5px 5px;"  for="<%= preco.id %>">
     <span></span><%= preco.VALOR %> €
     </label>
@@ -145,8 +133,6 @@
 
 <!-- TEMPLATE : FORNECEDORES -->
 <script id="fornecedores" type="text/template">
-<div id="Fornecedores" style="display:none;" class="container">
-
 <ul id="FORNCEDOR" class="item-edit">
     <% _.each(items, function(item){ %>
     <li>
@@ -163,21 +149,8 @@
     </li>
     <% }) %>
 </ul>
-
-<ul id="CONTACTO" class="related-items">
-    <li>Adicionar Contacto</li>
-<% _.each(contactos, function(contacto){ %>
-    <li><%= contacto.dummy %></li>
-<% }) %>
-    
-</ul>
-<div style="max-height: 800px; overflow: auto;" >
-<ul id="FORNECEDORES" class="items-list">
-<% _.each(fornecedores, function(fornecedor){ %>
-    <li><%= fornecedor.dummy %></li>
-<% }) %>
-</ul>
-</div>
+<div id="CONTACTO-mosaicos">
+    <ul class="related-items" style="padding: 7px;"></ul>
 </div>
 </script>
 <script type="text/javascript" src="script.js"></script>
