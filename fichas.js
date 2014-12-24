@@ -52,9 +52,13 @@
                     css: {
                         cursor: "pointer"
                     },
+                    attr: {
+                        href: "#Recursos/novo"
+                    },
                     click: function() {
-                        Fichas.fichas.novoRecurso();
+                        //Fichas.fichas.novoRecurso();
                         //Fichas.toolbox("recursos").novo();
+                        //return false;
                     }
                 },
                 {// update
@@ -63,17 +67,20 @@
                     css: {
                         cursor: "pointer"
                     },
-                    click: function() {
+                    attr: {
+                        href: "#Recursos/atualizar/RECURSO_ID/NOME,UNIDADE_CODIGO,TIPO_CODIGO"
+                    },
+                    _click: function() {
                         //console.log(this.innerHTML);
-                        Fichas.fichas.atualizarRecurso();
+                        Fichas.toolbar("recursos").atualizar();
                     }
                 },
                 {// delete
                     //text: "Eliminar",
                     html: '<img src="icons/16/close.png"> Eliminar',
                     css: { cursor: "pointer" },
-                    click: function() {
-                        Fichas.fichas.eliminar();
+                    attr: {
+                        href: "#Recursos/delete/RECURSO_ID/NOME"
                     }
                 },
                 {
@@ -204,9 +211,20 @@
             },
             // callback for Recursos
             callback: function(bar, toolbox){
-                // adicionar o template ao div principal
+                toolbox.entity("RECURSO");
+                toolbox.attributes([
+                    'RECURSO_ID',
+                    'NOME',
+                    'TIPO_CODIGO',
+                    'UNIDADE_CODIGO',
+                    'RECURSO_PRECO',
+                    'USER',
+                    'DATA_ATUALIZADO']);
+
+                // adicionar o template do editor ao div principal
                 toolbox.$container.append(_.template($("#recurso").html(), {
-                    items: [Fichas.fichas._novoRecurso()]
+                    //items: [Fichas.fichas._novoRecurso()]
+                    items: [toolbox._novo()]
                 }));
 
                 // não mostrar campos privados
@@ -248,10 +266,10 @@
                 Fichas.fichas.togglePrivateAttr("#RECURSO", true);
 
                 // preparar editos de recursos
-                Fichas.fichas.novoRecurso();
+                toolbox.novo();
 
                 // criar tabela de recursos
-                Fichas.fichas.tabelaRecurso();
+                toolbox.tabela();//Fichas.fichas.tabelaRecurso();
 
                 // precos
                 Fichas.fichas.precosRecurso("#PRECO-mosaicos ul");

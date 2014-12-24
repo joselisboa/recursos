@@ -22,12 +22,13 @@
     // load route from location hash
     Frontgate.router.route(location.hash);
 })({
-   conf: function(url, callback) {
+    conf: function(url, callback) {
         $.getJSON(url, function(conf) {
             console.log("conf", conf);
             if(callback) callback(conf);
         });
-   },
+    },
+
     routes: {
         "#user/:user/:pw": function(route) {
             var fichas = Frontgate.Apps("Fichas");
@@ -38,9 +39,11 @@
             });
         }
     },
+
     FICHAS: {},
+
     templates: {},
-    // 
+
     togglePanel: function(panel, flag) {
         if(flag) $(panel).fadeIn();
         else $(panel).fadeOut();
@@ -81,6 +84,7 @@
             DATA_ATUALIZADO: "ATUALIZADO"
         }
     },
+
     tableFieldWidth: function(table, field) {
         var value = field;
         if(this._fields[table] && this._fields[table][field]) value = this._fields[table][field];
@@ -101,7 +105,10 @@
                 // row attributes
                 for (var name in row) {
                     var value = row[name];
-                    items[k] = { name: name, value: value, "class": table+"-"+name };//TODO rever nome da class
+                    items[k] = {
+                        name: name, value: value,
+                        "class": table+"-"+name//TODO rever nome da class
+                    };
                     if(!lengths[k]) lengths[k] = Fichas.tableFieldWidth(table, name);
                     if(value.length > lengths[k].length) lengths[k].length = value.length;
                     k++;
@@ -128,7 +135,7 @@
 
             var selector = target+ " ul.table."+table;
 
-            if(callback) callback($(selector));//callback("#"+table+"-"+afix);//
+            if(callback) callback($(selector));
         });
     },
 
@@ -185,38 +192,6 @@
         var date = data.getFullYear() + '-' + (data.getMonth() + 1)+ '-' + data.getDate();
         //console.log("date", date);
         return date;
-    },
-
-    // eleminar RECURSO
-    eliminar: function() {
-        var recurso = this._getRecurso();
-        if(!recurso.RECURSO_ID) return;
-        if (!confirm("Eliminar o recurso '"+recurso.NOME+"'?")) { 
-            console.log("eliminação do recurso '"+recurso.NOME+"' cancelada");
-            return;
-        }
-
-        var Fichas = this;
-        Fichas.recursos("delete/" + recurso.RECURSO_ID, function(json){
-            console.log("delete/" + recurso.RECURSO_ID, json);
-
-            if(json == true) {
-                // limpar editor
-                Fichas.novoRecurso();
-
-                // atualizar a tabela
-                Fichas.tabelaRecurso();
-
-                // ... lista de preços
-            }
-        });
-    },
-
-    DISABLED_procurar: function() {
-        var recurso = prompt("recurso a procurar", "areia");
-        if(!recurso) return;
-        var query = "query/SELECT * FROM RECURSO WHERE NOME LIKE '%25" + recurso + "%25'";
-        this.tabelaRecurso(query);
     },
 
     //
@@ -301,7 +276,7 @@
         var dataset = el.dataset;
 
         var msg = "Eliminar o PREÇO '"+ span + "' ("+dataset.valor+" €)?"
-        if (!confirm(msg)) { 
+        if (!confirm(msg)) {
             console.log("eliminação de PREÇO cancelada");
             return;
         }
@@ -321,7 +296,6 @@
         else Fichas.delete_PRECO(dataset.fornecedor_id, dataset.recurso_id);
     },
 
-    // 
     _limparPrecosRecurso: function(el) {
         $(el).html("<button onclick=\"$('#adicionar-preco').click();\"=>Adicionar Preço</button>");
     },
@@ -356,219 +330,6 @@
         });
     },
 
-    //=========
-    // RECURSO
-    //=========
-
-    // constroi a tabela RECURSO
-    tabelaRecurso: function(query) {// query quado rende para uma procura
-        var Fichas = this;
-        $("#Recursos > ul.table.RECURSO").remove();
-        Fichas.tableFromQuery(query || "RECURSO", "RECURSO", "#Recursos", function($el){
-            // evento click nas linhas (recursos) da tabela
-            $el.show().not(".header").find("ul.row").click(function(e) {
-                // unselect selected row
-                $el.find("ul.row").removeClass("selected");
-
-                // select clicked row
-                $(this).addClass("selected");
-
-                // preenche o editor de recursos
-                Fichas._setRecurso(Fichas._getRecurso($(this)));
-
-                // atualizar painel de preços
-                Fichas.precosRecurso("#PRECO-mosaicos ul", $(this).find("li.RECURSO-RECURSO_ID").text());
-            });
-        });
-    },
-
-    // limpa o editor de recursos
-    novoRecurso: function() {
-        //
-        this._setRecurso(this._novoRecurso());
-        //
-        this._limparPrecosRecurso("#PRECO-mosaicos ul");
-    },
-
-    // validação de recurso existente
-    _validarRecurso: function(recurso) {
-        var dataset = $("#RECURSO")[0].dataset;
-
-        if(recurso.nome != dataset.nome
-            || recurso.tipo != dataset.tipo_codigo
-            || recurso.unidade != dataset.unidade_codigo) return recurso;
-
-        console.log("Recurso Sem Alteração");
-
-        return false;
-    },
-
-    // validacão de recurso
-    validarRecurso: function() {
-        console.log("A Validar Recurso");
-        var id = $("#RECURSO_ID").val();
-
-        // nome
-        var nome = $("#NOME").val();
-        if(!nome) return false;
-
-        // tipo
-        var tipo = $("#TIPO_CODIGO").val();
-        if(!tipo) return false;
-
-        // unidade
-        var unidade = $("#UNIDADE_CODIGO").val();
-        if(!unidade) return false;
-
-        var recurso = { nome: nome, tipo: tipo, unidade: unidade };
-        if(id) {
-            recurso.id = id;
-            return this._validarRecurso(recurso);
-        } 
-
-        return recurso;
-    },
-
-    // INSERT RECURSO
-    _insertRecurso: function(recurso) {
-        var Fichas = this;
-        var query = "query/SELECT * FROM RECURSO WHERE nome = '"+recurso.nome+"'";
-        // verificar se já existe recurso com o mesmo nome
-        Fichas.recursos(query, function(json) {
-            // o recurso não existe: adicionar recurso
-            if(!json.length) {
-                console.log("Adicionar Recurso", recurso);
-                var url = "recurso/" + recurso.nome + "/" + recurso.unidade + "/" + recurso.tipo;
-                // adicionar recurso
-                Fichas.recursos(url, function(json) {
-                    if(json == true) {
-                        // obter o recurso
-                        Fichas.recursos(query, function(json) {
-                            console.log(query, json);
-                            Fichas._setRecurso(json[0]);
-                            //Atualizar a tabela
-                            Fichas.tabelaRecurso();
-                        });
-                    }
-                    else console.log(url, json);
-                });
-            }
-            // o recurso existe
-            else console.log("recurso já existe", json);
-        });
-        return;
-    },
-
-    // UPDATE RECURSO
-    _updateRecurso: function(recurso) {
-        if(!recurso.id) return;
-        var Fichas = this;
-        var query = "query/SELECT * FROM RECURSO WHERE RECURSO_ID = "+recurso.id;
-        // verificar se já existe recurso com o mesmo nome
-        Fichas.recursos(query, function(json) {
-            // o recurso existe: atualizar o recurso
-            if(json.length) {
-                console.log("Actualizar Recurso", recurso);
-                var url = "recurso/"+ recurso.id + "/" + recurso.nome + "/" + recurso.unidade + "/" + recurso.tipo;
-                // actualizar o recurso
-                Fichas.recursos(url, function(json) {
-                    if(json == true) {
-                        // obter o recurso
-                        Fichas.recursos(query, function(json) {
-                            console.log(query, json);
-                            
-                            //Fichas._setRecurso(json[0]);
-                            
-                            // atualizar a tabela
-                            Fichas.tabelaRecurso();
-                        });
-                    }
-                    else console.log(url, json);
-                });
-                //Fichas.recursos();
-            }
-            // o recurso existe
-            else console.log("recurso não existe", json);
-        });
-    },
-
-    // atualizar (insert/update) recurso na BD
-    atualizarRecurso: function() {
-        var recurso = this.validarRecurso();
-
-        if(!recurso) {
-            console.log("O Recurso Não Passou Validação");
-            return;
-        }
-        // recurso novo
-        if(!recurso.id) return this._insertRecurso(recurso);
-        // recurso existente
-        return this._updateRecurso(recurso);
-    },
-
-    // objecto recurso vazio
-    _recurso: ['RECURSO_ID', 'NOME', 'TIPO_CODIGO', 'UNIDADE_CODIGO', 'RECURSO_PRECO', 'USER', 'DATA_ATUALIZADO'],
-    _novoRecurso: function() {
-        var recurso = {};
-        for(var i in this._recurso ) {
-            var nome = this._recurso[i];
-            if(nome == 'USER') recurso[nome] = this.user();
-            else if(nome == 'DATA_ATUALIZADO') recurso[nome] = this.hoje();
-            else recurso[nome] = "";
-        } 
-        console.log("recurso vazio", recurso);
-        return recurso;
-    },
-
-    // obtém dados do recurso
-    _getRecurso: function($ul) {
-        // na linha (elemento ul)
-        if($ul) return {
-            RECURSO_ID: $ul.find("li.RECURSO-RECURSO_ID").text(),
-            NOME: $ul.find("li.RECURSO-NOME").text(),
-            TIPO_CODIGO: $ul.find("li.RECURSO-TIPO_CODIGO").text(),
-            UNIDADE_CODIGO: $ul.find("li.RECURSO-UNIDADE_CODIGO").text(),
-            RECURSO_PRECO: $ul.find("li.RECURSO-RECURSO_PRECO").text(),
-            USER: $ul.find("li.RECURSO-USER").text(),
-            DATA_ATUALIZADO: $ul.find("li.RECURSO-DATA_ATUALIZADO").text()
-        };
-
-        // no editor
-        return {
-            RECURSO_ID: $("#RECURSO_ID").val(),
-            NOME: $("#NOME").val(),
-            TIPO_CODIGO: $("#TIPO_CODIGO").val(),
-            UNIDADE_CODIGO: $("#UNIDADE_CODIGO").val(),
-            RECURSO_PRECO: $("#RECURSO_PRECO").val(),
-            USER: $("#USER").val(),
-            DATA_ATUALIZADO: $("#DATA_ATUALIZADO").val()
-        };
-    },
-
-    // preenche o editor de Recursos
-    _setRecurso: function(recurso) {
-        //console.log("_setRecurso", recurso);
-        // input fields
-        $("#RECURSO_ID").val(recurso.RECURSO_ID);
-        $("#NOME").val(recurso.NOME);
-        $("#TIPO_CODIGO").val(recurso.TIPO_CODIGO);
-        $("#UNIDADE_CODIGO").val(recurso.UNIDADE_CODIGO);
-        $("#RECURSO_PRECO").val(recurso.RECURSO_PRECO);
-        $("#USER").val(recurso.USER);
-        var date = recurso.DATA_ATUALIZADO.split(" ")[0];
-        $("#DATA_ATUALIZADO").val(date);
-        // data attributes
-        $("#RECURSO").attr({
-            "data-RECURSO_ID": recurso.RECURSO_ID,
-            "data-NOME": recurso.NOME,
-            "data-TIPO_CODIGO": recurso.TIPO_CODIGO,
-            "data-UNIDADE_CODIGO": recurso.UNIDADE_CODIGO,
-            "data-RECURSO_PRECO": recurso.RECURSO_PRECO,
-            "data-USER": recurso.USER,
-            "data-DATA_ATUALIZADO": date
-        });
-    },
-
     // radios in #RECURSO_PRECO
     clickedRadio: function(el) {
         console.log("checked", el.checked);
@@ -596,8 +357,9 @@
 
     // Toolbox for Bar toolbox
     Toolbox: function(data) {
-        var creator = this;
         this.data = data;
+        var creator = this;
+        var parent = this.data.parent;
 
         var $body = $("#body");
         if(!$body.length) throw "missing div#body";
@@ -610,7 +372,297 @@
         this.onClick = null;
         this.onHash = null;
 
-        // add a route for #Recursos location hash
+        // constroi a tabela RECURSO
+        this.tabela = function(query) {// query quado rende para uma procura
+            var table_name = this.entity();
+            var Fichas = parent.fichas;
+            //"#Recursos > ul.table.RECURSO"
+            $(selector + " > ul.table." + table_name).remove();
+            Fichas.tableFromQuery(query || table_name, table_name, selector, function($el){
+                // evento click nas linhas (recursos) da tabela
+                $el.show().not(".header").find("ul.row").click(function(e) {
+                    // unselect selected row
+                    $el.find("ul.row").removeClass("selected");
+
+                    // select clicked row
+                    $(this).addClass("selected");
+
+                    // atualiza hash
+                    var recurso = creator.get($(this))
+                    location.hash = selector + "/"+recurso.RECURSO_ID;
+
+                    // preenche o editor de recursos
+                    creator.set(recurso);
+
+                    // atualizar painel de preços
+                    Fichas.precosRecurso("#PRECO-mosaicos ul", $(this).find("li.RECURSO-RECURSO_ID").text());
+                });
+            });
+        };
+
+        var _attributes = [];
+        this.attributes = function(attrs) {
+            // getter
+            if(!attrs) return _attributes;
+            // nok
+            if(!attrs.length) return false;
+            // setter
+            for(var i=0; i < attrs.length; i++) {
+                var attribute = attrs[i];
+                 if(typeof attribute != "string") throw "invalid attribute";
+                for(var j = 0; j < _attributes.length; j++ ) {
+                    // já existe
+                    if(attribute == _attributes[j]) break;
+                }
+                if(j < _attributes.length ) continue;
+                _attributes[_attributes.length] = attribute;
+            }
+            // ok
+            return true;
+        };
+
+        // valida os valores a atribuir [this.set] (alternativa ao argumento validate)
+        //TODO onSet
+        this.validate = function(attribute, value) {
+            switch(attribute) {
+                //case 'USER': return parent.fichas.user();
+                case 'DATA_ATUALIZADO': return value.split(" ")[0];
+                default: return value;
+            }
+        };
+
+        //TODO onNew
+        this.validateNew = function(attribute, value) {
+            if(attribute == "DATA_ATUALIZADO") return parent.fichas.hoje().split(" ")[0];
+            else if(attribute == "USER") return parent.fichas.user();
+            return value;
+        };
+
+        this._novo = function() {
+            console.log("Toolbox._novo();");
+            var entity = {};
+            for(var i in _attributes) {
+                var value = "";
+                entity[_attributes[i]] = value;
+            }
+            return entity;
+        }
+
+        // limpa o editor
+        this.novo = function() {
+            console.log("Toolbox.novo();");
+            this.set(this._novo(), this.validateNew);
+            //TODO limpar mosaicos
+            parent.fichas._limparPrecosRecurso("#PRECO-mosaicos ul");
+        };
+
+        // obtém dados do recurso
+        this.get = function($ul) {
+            var table_name = this.entity();
+            //console.log("Toolbox.get();");
+            var entity = {};
+            for(var i in _attributes) {
+                if($ul) entity[_attributes[i]] = $ul.find("li."+table_name+"-"+_attributes[i]).text();
+                else entity[_attributes[i]] = $("#"+_attributes[i]).val();
+            }
+            return entity;
+        };
+
+        // preenche o editor de Recursos
+        this.set = function(entity, validate) {
+            var table_name = this.entity();
+            var attributes = this.attributes();
+            for(var i in attributes) {
+                var attribute = attributes[i];
+                var value = entity[attribute];
+                if(validate) value = validate(attribute, value);
+                else if(this.validate) value = this.validate(attribute, value);
+                $("#"+attribute).val(value);//TODO rename selector
+                $("#"+table_name).attr("data-"+attribute , value);
+            }
+        };
+
+        // table name
+        var _entity = null;
+        this.entity = function(name) {
+            if(!name) {
+                if(!_entity) throw "table name is not set";
+                return _entity;
+            }
+            _entity = name;
+        };
+
+        // (sql) conditions
+        var _conditions = [];
+        this.conditions = function(conditions){
+            if(!conditions) return _conditions;
+            for(var i=0; i < conditions.length; i++) {
+                _conditions[_conditions.length] = conditions[i];
+            }
+        };
+
+        // eleminar RECURSO
+        //var _delete = function() {}
+        this.delete = function(id, nome) {
+            console.log("Toolbox.delete();");
+            var tableName = this.entity();
+            var entity = this.get();
+
+            if(!entity[id]) {
+                console.error("nothing to delete");
+                return;
+            }
+
+            if (!confirm("Eliminar a entidade '"+entity[nome]+"'?")) {
+                console.log("eliminação da entidade '"+entity[nome]+"' cancelada");
+                return;
+            }
+
+            parent.fichas.recursos("delete/"+entity[id], function(json) {
+                console.log("delete/"+entity[id], json);
+                if(json[0] == true) {
+                    // limpar editor
+                    //creator.novo();
+                    Frontgate.router.route(creator.route+"/novo");
+
+                    // atualizar a tabela
+                    creator.tabela();//parent.fichas.tabelaRecurso();
+
+                    // ... lista de preços
+                }
+            });
+        };
+
+        // INSERT RECURSO
+        this._insert = function(record, validate) {
+            var fichas = parent.fichas;
+            var name = validate[0];
+            var query = "query/SELECT * FROM "+this.entity()+" WHERE "+name+" = '"+record[name]+"'";
+            // verificar se já existe recurso com o mesmo nome
+            fichas.recursos(query, function(json) {
+                // o recurso não existe: adicionar recurso
+                if(!json.length) {
+                    console.log("Adicionar Registo", record);
+                    var url = creator.entity().toLowerCase();
+                    for(var i in validate) url = url + "/" + record[validate[i]];
+
+                    // adicionar recurso
+                    fichas.recursos(url, function(json) {
+                        if(json == true) {
+                            // obter o recurso
+                            fichas.recursos(query, function(json) {
+                                console.log(query, json);
+                                creator.set(json[0]);
+                                creator.tabela();//Atualizar a tabela
+                            });
+                        }
+                        else console.log(url, json);
+                    });
+                }
+                // o recurso existe
+                else console.log("registo já existe", json);
+            });
+            return;
+        };
+        //*/
+
+        // UPDATE RECURSO
+        this._update = function(record, id, validate) {
+            var fichas = parent.fichas;
+            var query = "query/SELECT * FROM "+creator.entity()+" WHERE "+id+" = "+record[id];
+            // verificar se já existe recurso com o mesmo nome
+            fichas.recursos(query, function(json) {
+                // o recurso existe: atualizar o recurso
+                if(json.length) {
+                    console.log("Actualizar Registo", record);
+                    var url = creator.entity().toLowerCase()+"/" + record[id];;
+                    for(var i in validate) url = url + "/" + record[validate[i]];
+
+                    // actualizar o recurso
+                    fichas.recursos(url, function(json) {
+                        if(json == true) {
+                            // obter o recurso
+                            fichas.recursos(query, function(json) {
+                                console.log(query, json);
+                                // atualizar a tabela
+                                creator.tabela();//Fichas.tabelaRecurso();
+                            });
+                        }
+                        else console.log(url, json);
+                    });
+                    //Fichas.recursos();
+                }
+                // o recurso existe
+                else console.log("registo não existe", json);
+            });
+        };
+        //*/
+
+        // atualizar (insert/update) recurso na BD
+        this.atualizar = function(id, validate) {
+            var record = this.validar(id, validate);
+
+            if(!record) {
+                console.error("O Recurso Não Passou Validação");
+                return;
+            }
+
+            // recurso novo
+            if(!record[id]) return this._insert(record, validate);
+            // recurso existente
+            return this._update(record, id, validate);
+        };
+
+        // validação de recurso existente
+        // this.validate WILL FAIL
+        this._validar = function(entity, validate) {
+            var dataset = $("#"+_entity)[0].dataset;
+            for(var i=0; i < validate.length; i++) {
+                var attribute = validate[i];
+                //console.log(attribute, dataset[attribute.toLowerCase()]);
+                if(entity[attribute] != dataset[attribute.toLowerCase()]) return entity;
+            }
+
+            console.info("Entidade Sem Alteração");
+            return false;
+        };
+
+        // validacão de recurso
+        this.validar = function(id, validate) {
+            console.log("A Validar Atributos", validate);
+            var entity = {};
+            for(var i in _attributes) {
+                var attribute = _attributes[i];
+                entity[attribute] = $("#"+attribute).val();
+            }
+
+            for(var i=0; i < validate.length; i++)
+                if(!entity[validate[i]]) return false;
+
+            if(!entity[id]) return entity;
+            return this._validar(entity, validate);
+        };
+
+        //--------
+        // ROUTES
+        //--------
+
+        // NEW
+        Frontgate.router.on(this.route + "/novo", function(route) { creator.novo(); });
+
+        // DELETE
+        Frontgate.router.on(this.route + "/delete/:id/:name", function(route) {
+            //console.log("DELETE", route);
+            creator.delete(route.attr.id, route.attr.name);
+        });
+
+        // UPDATE
+        Frontgate.router.on(this.route + "/atualizar/:id/:validate", function(route) {
+            location.hash = creator.route;
+            creator.atualizar(route.attr.id, route.attr.validate.split(","));
+        });
+
+        // add a route for <Toolbox.route> location hash
         Frontgate.router.on(this.route, function(route) {
             if(route.res.input == selector) {
                 $("div.toolbox.container").hide();
@@ -649,7 +701,7 @@
             var needle = prompt(msg || "valor a procurar", val || "");
             if(!needle) return;
             query = "query/" + query.replace("{needle}", needle);
-            this.data.parent.fichas.tabelaRecurso(query);
+            creator.tabela();//this.data.parent.fichas.tabelaRecurso(query);
         };
 
         // ...
@@ -703,8 +755,10 @@
                 toolbox_data.parent = self;
                 self.toolbox(toolbox, new Toolbox(toolbox_data));
             }
+            Frontgate.router.route("#Recursos");
         });
 
         // ...
     }
 });
+//811
