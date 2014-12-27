@@ -16,6 +16,6 @@ $.getScript("https://situs.pt/frontgate/and/router", function() {
     // load files
     (new Frontgate.Location({ hostname: "situs.pt", protocol:  "https:" }))
     .sync("lib/jquery-ui", "lib/topzindex", "lib/panel", "lib/_", "lib/bar", function(script) {
-        Frontgate.script("toolbar.js");
+        Frontgate.script("fichas.js");
     });
 });

@@ -91,7 +91,11 @@ button.cancel:hover {
     margin: 15px;*/
 }
 
-li.PRECO img {
+
+
+
+li.PRECO img, li.CONTACTO img {
+    float: right;
     opacity: 0;
     vertical-align: middle;
     /*
@@ -101,12 +105,22 @@ li.PRECO img {
     height: 16px;
     padding: 3px;
     margin-right: -8px;
-    margin-top: -6px;
+    margin-top: -2px;
     margin-left: 5px;
     cursor: pointer;
     transition: opacity 0.25s linear;
 }
-li.PRECO:hover img {
+
+li.CONTACTO label, li.PRECO label {
+    display: block;
+    font-family: monospace;
+    font-size: 18px;
+    font-weight: bold;
+    padding 5px;
+    margin: 0px 5px 5px 5px;
+}
+
+li.PRECO:hover img, li.CONTACTO:hover img {
     opacity: 1;
 } 
 
@@ -128,8 +142,10 @@ ul.item-edit, ul.related-items, ul.table {
     padding: 10px;
 }
 
-li.PRECO {
+li.PRECO, li.CONTACTO {
     background-color: white;
+    margin: 3px 5px;
+    box-shadow: 0 0 4px 0px rgba(0,0,0,.25);
 }
 
 ul.item-edit li {
@@ -163,7 +179,7 @@ ul.related-items {
 
 /*--------------
    placeholder
----------------*/
+---------------
 ::-webkit-input-placeholder {
  font-size: 14px;
  color: #d0cdfa;
@@ -172,14 +188,14 @@ ul.related-items {
  text-align: center;
  font-weight: bold;
 }
-:-moz-placeholder { /* older Firefox*/
+:-moz-placeholder {
  font-size:14px;
  color: #d0cdfa;
  text-transform: uppercase;
  text-align: center;
  font-weight: bold;
 }
-::-moz-placeholder { /* Firefox 19+ */ 
+::-moz-placeholder {
  font-size: 14px;
  color: #d0cdfa; 
  text-transform: uppercase;
@@ -193,6 +209,7 @@ ul.related-items {
  text-align: center;
  font-weight: bold;
 }
+*/
 
 /*-------------
     TABLES
@@ -243,7 +260,8 @@ ul.table.body ul.row.selected {
     background-color: rgba(0,0,0,.05);
 }
 
-#RECURSO[data-recurso_id=""] {
+#RECURSO[data-recurso_id=""],
+#FORNECEDOR[data-fornecedor_id=""] {
     border: solid 1px orange;
 }
 
@@ -256,7 +274,8 @@ ul.table > li {
     border: none;
 }
 /* row fields (columns) */
-ul.row li {padding: 2px 2px 2px 8px;
+ul.row li {
+    padding: 2px 2px 2px 8px;
     display: inline-block;
     text-align: left;
     font-family: consolas, monospace;
@@ -264,6 +283,11 @@ ul.row li {padding: 2px 2px 2px 8px;
     border: none;
     border-right: solid 1px;
     border-color: rgba(0,0,0,.15);
+}
+
+ul.row li.null {
+    color: silver;
+    font-style: italic;
 }
 
 #RECURSO > div {

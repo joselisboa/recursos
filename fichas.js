@@ -7,24 +7,28 @@
 // Webpage: https://situs.pt/recursos
 //
 
-(function(data) {
+(function(fichas) {
 
-    $("#D1").attr({
-        min: "2000-01-01",
-        max: Frontgate.Apps(data.toolbar.name).hoje()
+    // load toolbar
+    Frontgate.sync("toolbar.js", "app.js", function() {
+        $("#D1").attr({
+            min: "2000-01-01",
+            max: Frontgate.Apps(fichas.toolbar.name).hoje()
+        });
+
+        Frontgate.Apps("Fichas").data = fichas;
+
+        // load current location route
+        Frontgate.router.route(location.hash);
     });
-
-    window.Fichas = new Toolbar(data);
 
 })({
     toolbar: {
         name: "Fichas",
-        //container: "#fichas",
         items: [{
                 text: "Fichas de Rendimento"
             },
             {
-                //text: "",
                 html: '<img style="vertical-align: middle;" src="icons/16/user.png"> <span id="user"></span>',
                 attr: { id: "user-a" },
                 css: {
@@ -32,51 +36,29 @@
                     color:"rgba(0,0,0,.5)"
                 }
         }],
-        callback: function(bar) {
-            //console.log(this, arguments);
+        callback: function(bar, toolbar) {
             this.bar = bar;
-            //
-            $("#user").text(Frontgate.Apps("Fichas").user());
+            console.log('Frontgate.Apps("Fichas").user()', Frontgate.Apps("Fichas").user());
             $("#user-a").parent().css("float","right");
         }
     },
     toolboxes: {
         recursos: {
             toolbox: {
-                //App: {},// to get with Frontgate.Apps("Recursos")
                 name: "Recursos",
-                items: [
-                {// put
-                    //text: "Novo Recurso",
+                items: [{
                     html: '<img src="icons/16/document.png"> Novo Recurso',
-                    css: {
-                        cursor: "pointer"
-                    },
-                    attr: {
-                        href: "#Recursos/novo"
-                    },
-                    click: function() {
-                        //Fichas.fichas.novoRecurso();
-                        //Fichas.toolbox("recursos").novo();
-                        //return false;
-                    }
+                    css: { cursor: "pointer" },
+                    attr: { href: "#Recursos/novo" }
                 },
-                {// update
-                    //text: "Aplicar",
+                {
                     html: '<img src="icons/16/lightning.png"> Aplicar',
-                    css: {
-                        cursor: "pointer"
-                    },
+                    css: { cursor: "pointer" },
                     attr: {
                         href: "#Recursos/atualizar/RECURSO_ID/NOME,UNIDADE_CODIGO,TIPO_CODIGO"
-                    },
-                    _click: function() {
-                        //console.log(this.innerHTML);
-                        Fichas.toolbar("recursos").atualizar();
                     }
                 },
-                {// delete
-                    //text: "Eliminar",
+                {
                     html: '<img src="icons/16/close.png"> Eliminar',
                     css: { cursor: "pointer" },
                     attr: {
@@ -84,269 +66,199 @@
                     }
                 },
                 {
-                    //text: "Procurar",
                     html: '<img src="icons/16/search.png"> Procurar',
                     css: { cursor: "pointer" },
-                    click: function() {
-                        var query = "SELECT * FROM RECURSO WHERE NOME LIKE '%25{needle}%25'";
-                        Fichas.toolbox("recursos").procurar(query, "recurso a procurar", "");
-                    }
+                    attr: { href: "#Recursos/search/NOME" }
                 },
                 {
-                    //text: "Adicionar Preço",
                     html: '<img src="icons/16/add.png"> Adicionar Preço',
                     attr: { id: "adicionar-preco" },
                     css: { cursor: "pointer" },
-                    click: function() {
-                        //console.log(this.innerHTML);
-                        var id = $("#RECURSO_ID").val();
-                        var nome = $("#NOME").val();
-                        //TODO validate recurso (create recurso first)
-                        if(!id) {
-                            console.log("O Recurso Ainda não Existe");
-                            return;
-                        }
-
-                        var $precos = $("#PRECO-mosaicos li.PRECO");
-
-                        $("#PRECO-RECURSO_ID").attr("data-recurso_id", id).val(nome);
-
-                        $("#add-preco > ul.table.FORNECEDOR").remove();
-                        Fichas.fichas.tabela("FORNECEDOR", "#add-preco", function($el) {
-                            var rows =  $el[1];// body
-
-                            // rows => ul.body > li ul.row > li
-                            $(rows).find("ul.row").each(function(index){
-                                var row = this;
-                                $precos.each(function(xindex){
-                                    if(Fichas.fichas.fornecedor(row).id == this.dataset.fornecedor_id) $(row).parent().remove();
-                                });
-                            });
-
-                            if(!$(rows).find('li').length) {
-                                console.log("Não Existem Fornecedores Para O Fornecimento");
-                                return;
-                            }
-
-                            $el.show().not(".header").find("ul.row").click(function(e) {
-                                $el.find("ul.row").removeClass("selected");// unselect selected row
-                                $(this).addClass("selected");// select clicked row
-                                var fornecedor = Fichas.fichas.fornecedor(this);
-                                console.log("PRECO > FORNECEDOR", fornecedor);
-                                $("#F1").attr("data-fornecedor_id", fornecedor.id).val(fornecedor.nome);
-                            });
-
-                            $("#overlay div").hide();
-                            $("#add-preco").show();
-                            $("#overlay").fadeIn();
-                        });
-                    }
+                    attr: { href: "#Recursos/adicionar-preco" }
                 },
                 {
-                    //text: "Atributos Privados",
-                    html: '<img src="icons/16/eye.png">',
+                    html: '<img src="icons/16/eye.png"> Atributos Privados',
                     css: { cursor: "pointer" },
-                    click: function() {
-                        Fichas.fichas.togglePrivateAttr("#RECURSO");
-                    }
-                },
-                {
-                    text: "ok-add-preco",
-                    attr: { id: "ok-add-preco" },
-                    css: { display: "none" },
-                    click: function(e){
-                        // validar recurso
-                        var recurso_id = $("#PRECO-RECURSO_ID").attr("data-recurso_id");
-                        if(!recurso_id) {
-                            console.log("Recurso Inválido");
-                            return;
-                        }
-                        // validar fornecedor
-                        var fornecedor_id = $("#F1").attr("data-fornecedor_id");
-                        if(!fornecedor_id) {
-                            console.log("Fornecedor Inválido");
-                            return;
-                        }
-                        // validar valor
-                        var valor = $("#V1").val();
-                        if(!valor || !(valor.match(/^-?\d*(\.\d+)?$/))) {
-                            console.log("Valor Inválido");
-                            return;
-                        }
-                        // validar data
-                        var data = $("#D1").val();
-                        if(!data) {
-                            console.log("Data Inválida");
-                            return;
-                        }
-                        // INSERT PRECO
-                        var url = "preco/"+recurso_id+"/"+fornecedor_id+"/"+valor+"/"+data;
-                        Fichas.fichas.recursos(url, function(json) {
-                            //TODO refrescar recurso
-                            console.log(url, json);
-
-                            //precosRecurso: function(el, id)
-                            Fichas.fichas.precosRecurso("#PRECO-mosaicos ul", recurso_id);
-
-                            // voltar ao editor
-                            $("#overlay").fadeOut();
-                        });
-                        // done
-                        console.info(this.innerHTML, "waiting ...");
-                    }
+                    attr: { href: "#Recursos/private" }
                 },
                 {
                     text: "cancel-add-preco",
                     attr: { id: "cancel-add-preco" },
                     css: { display: "none" },
-                    click: function(){
-                        console.log(this.innerHTML);
-                        $("#overlay").fadeOut();
-                    }
-                }],
-                // disabled with _
-                _validate: function(item) {
-                    console.log("#fichas toolbox item ", item);
-                }
-            },
-            // callback for Recursos
-            callback: function(bar, toolbox){
-                toolbox.entity("RECURSO");
-                toolbox.attributes([
-                    'RECURSO_ID',
-                    'NOME',
-                    'TIPO_CODIGO',
-                    'UNIDADE_CODIGO',
-                    'RECURSO_PRECO',
-                    'USER',
-                    'DATA_ATUALIZADO']);
-
-                // adicionar o template do editor ao div principal
-                toolbox.$container.append(_.template($("#recurso").html(), {
-                    //items: [Fichas.fichas._novoRecurso()]
-                    items: [toolbox._novo()]
-                }));
-
-                // não mostrar campos privados
-                $("#RECURSO_PRECO, #USER, #DATA_ATUALIZADO, #RECURSO_ID")
-                    .attr("disabled", "disabled").parent().addClass("private");
-
-                //
-                $("#RECURSO_ID").attr({
-                    "placeholder": "#"
-                });
-
-                $("#NOME").attr({
-                    "placeholder": "Nome"
-                });
-
-                $("#RECURSO_PRECO").attr({
-                    "placeholder": "€"
-                });
-
-                $("#DATA_ATUALIZADO").attr({
-                    "min": "2015-01-01",
-                    "max": "2015-12-31",
-                    "type": "date"
-                });
-
-                // lista de tipos
-                $("#TIPO_CODIGO").html(_.template($("#tipo_option").html(), {
-                    items: Fichas.fichas.FICHAS.Tables.TIPO
-                }));
-
-                // desativar o tipo COMPOSTO
-                $('#TIPO_CODIGO option[value="COM"]').attr("disabled","disabled");
-
-                // lista de unidades
-                $("#UNIDADE_CODIGO").html(_.template($("#unidade_option").html(), {
-                    items: Fichas.fichas.FICHAS.Tables.UNIDADE
-                }));
-
-                Fichas.fichas.togglePrivateAttr("#RECURSO", true);
-
-                // preparar editos de recursos
-                toolbox.novo();
-
-                // criar tabela de recursos
-                toolbox.tabela();//Fichas.fichas.tabelaRecurso();
-
-                // precos
-                Fichas.fichas.precosRecurso("#PRECO-mosaicos ul");
-            }
-        },
-        compostos: {
-            toolbox: {
-                name: "Compostos",
-                items: [
-                {// put
-                    text: "Novo Composto",
-                    click: function() {
-                        console.log(this.innerHTML);
-                    }
-                },
-                {// update
-                    text: "Atualizar",
-                    click: function() {
-                        console.log(this.innerHTML);
-                    }
-                },
-                {
-                    text: "Procurar",
-                    click: function() {
-                        console.log(this.innerHTML);
-                    }
-                },
-                {// delete
-                    text: "Eliminar",
-                    click: function() {
-                        console.log(this.innerHTML);
-                    }
+                    attr: { href: "#Recursos/cancel" }
                 }]
+            },
+            callback: function(bar, toolbox) {
+                toolbox.entity("RECURSO", function() {
+                    toolbox.private(["RECURSO_PRECO", "FORNECEDOR_ID", "USER", "DATA_ATUALIZADO", "RECURSO_ID"])
+                    .placeholder({ RECURSO_ID: "#", NOME: "Nome", RECURSO_PRECO: "€" });
+
+                    $("#RECURSO-DATA_ATUALIZADO").attr({
+                        "min": "2015-01-01",
+                        "max": "2015-12-31",
+                        "type": "date"
+                    });
+
+                    // lista de tipos
+                    $("#RECURSO-TIPO_CODIGO").html(_.template($("#tipo_option").html(), {
+                        items: Fichas.fichas.FICHAS.Tables.TIPO
+                    }));
+
+                    // lista de unidades
+                    $("#RECURSO-UNIDADE_CODIGO").html(_.template($("#unidade_option").html(), {
+                        items: Fichas.fichas.FICHAS.Tables.UNIDADE
+                    }));
+
+                    // não mostrar recursos compostos
+                    toolbox.on("tableRows", function(rows) {
+                        $(rows).find("ul.row").click(function(e) {
+                            if($(this).find("li.RECURSO-TIPO_CODIGO").text() == "COM") {
+                                Fichas.fichas.toggleComposto(true);
+                            }
+                            else {
+                                Fichas.fichas.precosRecurso("#PRECO-mosaicos ul", $(this).find("li.RECURSO-RECURSO_ID").text());
+                                Fichas.fichas.toggleComposto(false);
+                            }
+                        });
+
+                    });
+
+                    toolbox.on("recursoChange", function(){
+                        Fichas.fichas.toggleComposto($('#RECURSO-TIPO_CODIGO').val() == "COM");
+                    });
+
+                    toolbox.on("novo", function(){
+                        $("#PRECO-mosaicos").hide();
+                        $("#RENDIMENTO-mosaicos").hide();
+                        Fichas.fichas._limparPrecosRecurso("#PRECO-mosaicos ul");
+                        $('#RECURSO-TIPO_CODIGO').attr("disabled", false);
+                        $('#RECURSO-TIPO_CODIGO option[value="COM"]').show();
+                    });
+
+                    // esconder privados; limpar editor; render tabela
+                    toolbox.private(true).novo().tabela();
+
+                    // precos
+                    Fichas.fichas.precosRecurso("#PRECO-mosaicos ul");
+                });
             }
         },
+
         fornecedores: {
             toolbox: {
                 name: "Fornecedores",
                 items: [{
-                    text:"Novo",
-                    attr:{
-                        title: "Adicionar Fornecedor",
-                        href: "#FornecedorNovo"
+                    html: '<img src="icons/16/document.png"> Novo Fornecedor',
+                    css: { cursor: "pointer" },
+                    attr: { href: "#Fornecedores/novo" }
+                },
+                {
+                    html: '<img src="icons/16/lightning.png"> Aplicar',
+                    css: { cursor: "pointer" },
+                    attr: {
+                        href: "#Fornecedores/atualizar/FORNECEDOR_ID/FORNECEDOR_NOME,FORNECEDOR_MORADA"
                     }
                 },
                 {
-                    text:"Editar",
-                    attr:{
-                        title: "Editar Fornecedor",
-                        href: "#FornecedorEditar"
+                    html: '<img src="icons/16/close.png"> Eliminar',
+                    css: { cursor: "pointer" },
+                    attr: {
+                        href: "#Fornecedores/delete/FORNECEDOR_ID/FORNECEDOR_NOME"
                     }
                 },
                 {
-                    text:"Eliminar",
-                    attr:{
-                        title: "Eliminar Fornecedor",
-                        href: "#FornecedorEliminar"
-                    },
-                    click: function(){
-                        // returning false prevents default
-                        // will not set location.hash
-                        alert("preventing default");
-                        return false;
-                    }
+                    html: '<img src="icons/16/add.png"> Adicionar Preço',
+                    attr: { id: "adicionar-preco" }
+                },
+                {
+                    html: '<img src="icons/16/search.png"> Procurar',
+                    css: { cursor: "pointer" },
+                    attr: { href: "#Fornecedores/search/FORNECEDOR_NOME" }
+                },
+                {
+                    html: '<img src="icons/16/eye.png"> Atributos Privados',
+                    css: { cursor: "pointer" },
+                    attr: { href: "#Fornecedores/private" }
                 }]
             },
             // callback de Fornecedores
             callback: function(bar, toolbox) {
-                toolbox.$container.append(_.template($("#fornecedores").html(), {
-                    items:[{ FORNECEDOR_ID: "", FORNECEDOR_NOME: "", FORNECEDOR_MORADA: ""}]
-                }));
-
-                $("#FORNECEDOR_ID").attr("disabled", "disabled");
-
-                Fichas.fichas.recursos("/FORNECEDOR", function(json){
-                    console.log("/fornecedor", json);
-                })
+                toolbox.entity("FORNECEDOR", function() {
+                    toolbox.on("tabela", function(el){
+                        Fichas.fichas.contactosFornecedor("#CONTACTO-mosaicos ul", $(el).find("li.FORNECEDOR-FORNECEDOR_ID").text());
+                    }).on("novo", function(el) {
+                        Fichas.fichas._limpaContactos("#CONTACTO-mosaicos ul");
+                    });
+                    toolbox.private(["FORNECEDOR_ID"]).private(true).novo().tabela();
+                });
+            }
+        },
+        unidades: {
+            toolbox: {
+                name: "Unidades",
+                items: [{
+                    html: '<img src="icons/16/document.png"> Nova Unidade',
+                    css: { cursor: "pointer" },
+                    attr: { href: "#Unidades/novo" }
+                },
+                {
+                    html: '<img src="icons/16/lightning.png"> Aplicar',
+                    css: { cursor: "pointer" },
+                    attr: {
+                        href: "#Unidades/atualizar/UNIDADE_CODIGO/UNIDADE_NOME"
+                    }
+                },
+                {
+                    html: '<img src="icons/16/close.png"> Eliminar',
+                    css: { cursor: "pointer" },
+                    attr: {
+                        href: "#Unidades/delete/UNIDADE_CODIGO/UNIDADE_NOME"
+                    }
+                },
+                {
+                    html: '<img src="icons/16/search.png"> Procurar',
+                    css: { cursor: "pointer" },
+                    attr: { href: "#Unidades/search" }
+                }]
+            },
+            callback: function(bar, toolbox) {
+                toolbox.entity("UNIDADE", function() {
+                    toolbox.novo().tabela();
+                });
+            }
+        },
+        tipos: {
+            toolbox: {
+                name: "Tipos",
+                items: [{
+                    html: '<img src="icons/16/document.png"> Novo Tipo',
+                    css: { cursor: "pointer" },
+                    attr: { href: "#Tipos/novo" }
+                },
+                {
+                    html: '<img src="icons/16/lightning.png"> Aplicar',
+                    css: { cursor: "pointer" },
+                    attr: {
+                        href: "#Tipos/atualizar/TIPO_CODIGO/TIPO_NOME"
+                    }
+                },
+                {
+                    html: '<img src="icons/16/close.png"> Eliminar',
+                    css: { cursor: "pointer" },
+                    attr: {
+                        href: "#Tipos/delete/TIPO_CODIGO/TIPO_NOME"
+                    }
+                },
+                {
+                    html: '<img src="icons/16/search.png"> Procurar',
+                    css: { cursor: "pointer" },
+                    attr: { href: "#Tipos/search" }
+                }]
+            },
+            callback: function(bar, toolbox) {
+                toolbox.entity("TIPO", function() {
+                    toolbox.novo().tabela();
+                });
             }
         }
     }
