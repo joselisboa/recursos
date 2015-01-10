@@ -85,16 +85,13 @@ button.cancel:hover {
 /*-----------------------------
        RECURSO-PRECO
 -----------------------------*/
-#PRECO-mosaicos, #CONTACTO-mosaicos {
+div.mosaicos {
     display: inline-block;
    /* border: solid 1px rgba(0,0,0,.1);
     margin: 15px;*/
 }
 
-
-
-
-li.PRECO img, li.CONTACTO img {
+li.PRECO img, li.CONTACTO img, li.RENDIMENTO img {
     float: right;
     opacity: 0;
     vertical-align: middle;
@@ -111,7 +108,7 @@ li.PRECO img, li.CONTACTO img {
     transition: opacity 0.25s linear;
 }
 
-li.CONTACTO label, li.PRECO label {
+li.CONTACTO label, li.PRECO label, li.RENDIMENTO label {
     display: block;
     font-family: monospace;
     font-size: 18px;
@@ -120,7 +117,7 @@ li.CONTACTO label, li.PRECO label {
     margin: 0px 5px 5px 5px;
 }
 
-li.PRECO:hover img, li.CONTACTO:hover img {
+li.PRECO:hover img, li.CONTACTO:hover img, li.RENDIMENTO:hover img {
     opacity: 1;
 } 
 
@@ -142,7 +139,7 @@ ul.item-edit, ul.related-items, ul.table {
     padding: 10px;
 }
 
-li.PRECO, li.CONTACTO {
+li.PRECO, li.CONTACTO, li.RENDIMENTO{
     background-color: white;
     margin: 3px 5px;
     box-shadow: 0 0 4px 0px rgba(0,0,0,.25);
