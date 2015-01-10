@@ -27,8 +27,8 @@
         "#user/:user/:pw": function(route) {
             var app = Frontgate.Apps("Fichas");
             if(typeof app.API != "undefined") return;
-            app.conf("conf.json", function(conf) {
-                app.api(route.attr);
+            app.conf("conf.json", function (conf) {
+                app.api(route.attr, conf);
                 window.Fichas = new Toolbar(app.data);
             });
         },
