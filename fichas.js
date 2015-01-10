@@ -72,9 +72,13 @@
                 },
                 {
                     html: '<img src="icons/16/add.png"> Adicionar Preço',
-                    attr: { id: "adicionar-preco" },
-                    css: { cursor: "pointer" },
-                    attr: { href: "#Recursos/adicionar-preco" }
+                    css: { display: "none", cursor: "pointer" },
+                    attr: { id: "adicionar-preco", href: "#Recursos/adicionar-preco" }
+                },
+                {
+                    html: '<img src="icons/16/add.png"> Adicionar Rendimento',
+                    css: { display: "none", cursor: "pointer" },
+                    attr: { id: "adicionar-rendimento", href: "#Recursos/adicionar-rendimento" }
                 },
                 {
                     html: '<img src="icons/16/eye.png"> Atributos Privados',
@@ -90,8 +94,9 @@
             },
             callback: function(bar, toolbox) {
                 toolbox.entity("RECURSO", function() {
+                    // estado inicial dos campos
                     toolbox.private(["RECURSO_PRECO", "FORNECEDOR_ID", "USER", "DATA_ATUALIZADO", "RECURSO_ID"])
-                    .placeholder({ RECURSO_ID: "#", NOME: "Nome", RECURSO_PRECO: "€" });
+                        .placeholder({ RECURSO_ID: "#", NOME: "Nome", RECURSO_PRECO: "€" });
 
                     $("#RECURSO-DATA_ATUALIZADO").attr({
                         "min": "2015-01-01",
@@ -100,37 +105,46 @@
                     });
 
                     // lista de tipos
-                    $("#RECURSO-TIPO_CODIGO").html(_.template($("#tipo_option").html(), {
+                    $("#RECURSO-TIPO_CODIGO").html(_.template($("#template-TIPO-option").html(), {
                         items: Fichas.fichas.FICHAS.Tables.TIPO
                     }));
 
                     // lista de unidades
-                    $("#RECURSO-UNIDADE_CODIGO").html(_.template($("#unidade_option").html(), {
+                    $("#RECURSO-UNIDADE_CODIGO").html(_.template($("#template-UNIDADE-option").html(), {
                         items: Fichas.fichas.FICHAS.Tables.UNIDADE
                     }));
 
-                    // não mostrar recursos compostos
+                    // create event: select recurso on table row
                     toolbox.on("tableRows", function(rows) {
                         $(rows).find("ul.row").click(function(e) {
+                            // recurso é composto
                             if($(this).find("li.RECURSO-TIPO_CODIGO").text() == "COM") {
+                                // obter rendimentos
+                                Fichas.fichas.rendimentosRecurso($(this).find("li.RECURSO-RECURSO_ID").text());
                                 Fichas.fichas.toggleComposto(true);
                             }
+                            // recurso é simples
                             else {
-                                Fichas.fichas.precosRecurso("#PRECO-mosaicos ul", $(this).find("li.RECURSO-RECURSO_ID").text());
+                                // obter os preços
+                                Fichas.fichas.precosRecurso($(this).find("li.RECURSO-RECURSO_ID").text());
                                 Fichas.fichas.toggleComposto(false);
                             }
                         });
-
                     });
 
+                    // create event: on recurso (in editor) change
                     toolbox.on("recursoChange", function(){
                         Fichas.fichas.toggleComposto($('#RECURSO-TIPO_CODIGO').val() == "COM");
                     });
 
-                    toolbox.on("novo", function(){
+                    // create event: new recurso
+                    toolbox.on("novo", function () {
+                        $("#adicionar-preco").hide();
+                        $("#adicionar-rendimento").hide();
                         $("#PRECO-mosaicos").hide();
                         $("#RENDIMENTO-mosaicos").hide();
-                        Fichas.fichas._limparPrecosRecurso("#PRECO-mosaicos ul");
+                        Fichas.fichas.limparPrecosRecurso();
+                        $(Fichas.fichas.rendimentosEl).html("<li>EMPTY</li>");
                         $('#RECURSO-TIPO_CODIGO').attr("disabled", false);
                         $('#RECURSO-TIPO_CODIGO option[value="COM"]').show();
                     });
@@ -139,7 +153,10 @@
                     toolbox.private(true).novo().tabela();
 
                     // precos
-                    Fichas.fichas.precosRecurso("#PRECO-mosaicos ul");
+                    Fichas.fichas.precosRecurso();
+
+                    // rendimentos
+
                 });
             }
         },
@@ -167,8 +184,12 @@
                     }
                 },
                 {
-                    html: '<img src="icons/16/add.png"> Adicionar Preço',
-                    attr: { id: "adicionar-preco" }
+                    html: '<img src="icons/16/add.png"> Adicionar Contacto',
+                    css: { cursor: "pointer" },
+                    attr: {
+                        id: "adicionar-contacto",
+                        href: "#Recursos/adicionar-contacto"
+                    }
                 },
                 {
                     html: '<img src="icons/16/search.png"> Procurar',

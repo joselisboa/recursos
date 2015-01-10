@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -9,210 +9,219 @@
 <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-<div id="body"></div>
-<div id="overlay">
-    <div id="add-preco" style="margin-top: 25px;">
-        <h1 style="text-align: left; padding: 5px 10px;">adicionar preço</h1>
-        <ul id="PRECO" style="text-align: left;" class="item-edit entity">
-            <li class="attribute">
-                <label style="width: 80px;" for="PRECO-RECURSO_ID">RECURSO</label>
-                <input type="text" id="PRECO-RECURSO_ID" value="" disabled></input>
-            </li>
-            <li class="attribute">
-                <label style="width: 80px;" for="F1">FORNECEDOR</label>
-                <input id="F1" value="" disabled placeholder="Fornecedor"></input>
-            </li>
-            <li class="attribute">
-                <label style="width: 80px;" for="V1">PREÇO</label>
-                <input type="text" id="V1" value="" placeholder="Preço"></input>
-            </li>
-            <li class="attribute">
-                <label style="width: 80px;" for="D1">DATA</label>
-                <input type="date" id="D1" value=""></input>
-            </li>
-        </ul>
-        <ul class="related-items" style="padding: 7px;">
-            <button class="ok" onclick="location.hash = '#Recursos/ok';">APLICAR</button>
-            <button class="cancel" onclick="location.hash = '#Recursos/cancel';">CANCELAR</button>
-        </ul>
-    </div>
-
-    <div id="add-rendimento" style="margin-top: 25px;">
-        <ul id="RENDIMENTO" style="text-align: left;" class="item-edit entity">
-            <!-- RENDIMENTO REC_RECURSO_ID -->
-            <!-- RENDIMENTO RECURSO_ID -->
-            <!-- RENDIMENTO QUANTIDADE -->
-            <!-- RENDIMENTO PRECO_PARCIAL -->
-            <!-- RENDIMENTO DATA -->
-            <!-- RENDIMENTO USER -->
-        </ul>
-        <ul class="related-items" style="padding: 7px;">
-            <button class="ok" onclick="location.hash = '#Rendimento/ok';">APLICAR</button>
-            <button class="cancel" onclick="$('#overlay').fadeOut();">CANCELAR</button>
-        </ul>
-    </div>
-
-</div>
-<script id="rows-template" type="text/template">
-    <ul class="<%= classe %>">
-    <% _.each(items, function(item){ %>
-    <li><%= item.data %></li>
-    <% }) %>
-    </ul>
-</script>
-
-<script id="row-template" type="text/template">
-    <ul class="row">
-    <% _.each(items, function(item){ %>
-        <li class="<%= item.class %>"><%= item.value %></li>
-    <% }) %>
-    </ul>
-</script>
-
-<script id="input-template" type="text/template">
-    <label for="<%= attribute.name %>"><%= item.name %></label>
-    <input id="<%= attribute.name %>" value="<%= attribute.value %>"></input>
-</script>
-
-<script id="unidade_option" type="text/template">
-    <% _.each(items, function(item){ %>
-    <option title="<%= item.UNIDADE_NOME %>" value="<%= item.UNIDADE_CODIGO %>"><%= item.UNIDADE_CODIGO %></option>
-    <% }) %>
-</script>
-
-<script id="tipo_option" type="text/template">
-    <% _.each(items, function(item){ %>
-    <option title="<%= item.TIPO_NOME %>" value="<%= item.TIPO_CODIGO %>"><%= item.TIPO_CODIGO %></option>
-    <% }) %>
-</script>
-
-<script id="template-recurso" type="text/template">
-    <ul id="RECURSO" class="item-edit entity">
-        <% _.each(items, function(item){ %>
-        <li class="attribute RECURSO_ID">
-        <label for="RECURSO-RECURSO_ID">R_ID</label>
-        <input type="text" id="RECURSO-RECURSO_ID" value="<%= item.RECURSO_ID %>"></input>
-        <li class="attribute FORNECEDOR_ID">
-        <label for="RECURSO-FORNECEDOR_ID">F_ID</label>
-        <input type="text" id="RECURSO-FORNECEDOR_ID" value="<%= item.RECURSO_ID %>"></input>
-        </li>
-        <li class="attribute NOME">
-        <label for="RECURSO-NOME">NOME</label>
-        <input type="text" id="RECURSO-NOME" value="<%= item.NOME %>"></input>
-        </li>
-        <li class="attribute TIPO_CODIGO">
-        <label for="RECURSO-TIPO_CODIGO">TIPO</label>
-        <select id="RECURSO-TIPO_CODIGO" value="<%= item.TIPO_CODIGO %>"></select>
-        </li>
-        <li class="attribute UNIDADE_CODIGO">
-        <label for="RECURSO-UNIDADE_CODIGO">UNIDADE</label>
-        <select id="RECURSO-UNIDADE_CODIGO" value="<%= item.UNIDADE_CODIGO %>"></select>
-        </li>
-        <li class="attribute RECURSO_PRECO">
-        <label for="RECURSO-RECURSO_PRECO">PREÇO</label>
-        <input type="text" id="RECURSO-RECURSO_PRECO" value="<%= item.RECURSO_PRECO %>"></input>
-        </li>
-        <li class="attribute DATA_ATUALIZADO">
-        <label for="RECURSO-DATA_ATUALIZADO">DATA</label>
-        <input type="date" id="RECURSO-DATA_ATUALIZADO" value="<%= item.DATA_ATUALIZADO %>"></input>
-        </li>
-        <li class="attribute ">
-        <label for="RECURSO-USER">USER</label>
-        <input type="text" id="RECURSO-USER" value="<%= item.USER %>"></input>
-        </li>
-        <% }) %>
-    </ul>
-    <div id="PRECO-mosaicos">
-        <ul class="related-items" style="padding: 7px;"></ul>
-    </div>
-</script>
-
-<script id="FORNECEDOR-CONTACTO-template" type="text/template">
-    <% _.each(contactos, function(contacto){ %>
-        <li class="CONTACTO">
-        <div style="text-align:left;">
-            <span style="vertical-align: middle;font-size: 90%; "><%= contacto.CONTACTO_DESCRITIVO %></span>
-            <img src="icons/16/close.png" class="eliminar" title="Eliminar">
+    <div id="body"></div>
+    <div id="overlay">
+        <div id="add-preco" style="margin-top: 25px;">
+            <h1 style="text-align: left; padding: 5px 10px;">adicionar preço</h1>
+            <ul id="PRECO" style="text-align: left;" class="item-edit entity">
+                <li class="attribute">
+                    <label style="width: 80px;" for="PRECO-RECURSO_ID">RECURSO</label>
+                    <input type="text" id="PRECO-RECURSO_ID" value="" disabled>
+                </li>
+                <li class="attribute">
+                    <label style="width: 80px;" for="F1">FORNECEDOR</label>
+                    <input id="F1" value="" disabled placeholder="Fornecedor">
+                </li>
+                <li class="attribute">
+                    <label style="width: 80px;" for="V1">PREÇO</label>
+                    <input type="text" id="V1" value="" placeholder="Preço">
+                </li>
+                <li class="attribute">
+                    <label style="width: 80px;" for="D1">DATA</label>
+                    <input type="date" id="D1" value="">
+                </li>
+            </ul>
+            <ul class="related-items" style="padding: 7px;">
+                <li>
+                    <button class="ok" onclick="location.hash = '#Recursos/ok';">APLICAR</button>
+                    <button class="cancel" onclick="location.hash = '#Recursos/cancel';">CANCELAR</button>
+                </li>
+            </ul>
         </div>
-        <label><%= contacto.CONTACTO_NUMERO %></label>
-        </li>
-    <% }) %>
-</script>
-
-<script id="RECURSO-PRECO-template" type="text/template">
-    <% _.each(precos, function(preco){ %>
-        <li class="PRECO"
-            data-DATA="<%= preco.DATA %>"
-            data-RECURSO_ID="<%= preco.RECURSO_ID %>"
-            data-VALOR="<%= preco.VALOR %>"
-            data-FORNECEDOR_ID="<%= preco.FORNECEDOR_ID %>">
-        <div style="text-align:left;">
-            <input onchange="Frontgate.Apps('Fichas').clickedRadio(this);"
-                type="radio" id="<%= preco.id %>"
-                name="preco"
-                style="vertical-align: middle; margin-right: 4px;">
-            <span style="vertical-align: middle;font-size: 90%; "><%= preco.fornecedor %> <%= preco.DATA %></span>
-            <img src="icons/16/close.png" class="eliminar" title="Eliminar">
+        <div id="add-rendimento" style="margin-top: 25px;">
+            <ul id="RENDIMENTO" style="text-align: left;" class="item-edit entity">
+                <!-- RENDIMENTO REC_RECURSO_ID -->
+                <!-- RENDIMENTO RECURSO_ID -->
+                <!-- RENDIMENTO QUANTIDADE -->
+                <!-- RENDIMENTO PRECO_PARCIAL -->
+                <!-- RENDIMENTO DATA -->
+                <!-- RENDIMENTO USER -->
+            </ul>
+            <ul class="related-items" style="padding: 7px;">
+                <li>
+                    <button class="ok" onclick="location.hash = '#Rendimento/ok';">APLICAR</button>
+                    <button class="cancel" onclick="$('#overlay').fadeOut();">CANCELAR</button>
+                </li>
+            </ul>
         </div>
-        <label for="<%= preco.id %>">
-        <span></span><%= preco.VALOR %> €
-        </label>
-        </li>
-    <% }) %>
-</script>
-
-<script id="template-fornecedor" type="text/template">
-    <ul id="FORNECEDOR" class="item-edit entity">
-        <% _.each(items, function(item){ %>
-        <li>
-        <label for="FORNECEDOR-FORNECEDOR_ID">ID</label>
-        <input type="text" id="FORNECEDOR-FORNECEDOR_ID" value="<%= item.FORNECEDOR_ID %>" placeholder="#"></input>
-        </li>
-        <li>
-        <label for="FORNECEDOR-FORNECEDOR_NOME">NOME</label>
-        <input type="text" id="FORNECEDOR-FORNECEDOR_NOME" value="<%= item.FORNECEDOR_NOME %>" placeholder="Nome"></input>
-        </li>
-        <li>
-        <label for="FORNECEDOR-FORNECEDOR_MORADA">MORADA</label>
-        <input type="text" id="FORNECEDOR-FORNECEDOR_MORADA" value="<%= item.FORNECEDOR_MORADA %>" placeholder="Morada"></input>
-        </li>
-        <% }) %>
-    </ul>
-    <div id="CONTACTO-mosaicos">
-        <ul class="related-items" style="padding: 7px;"></ul>
     </div>
-</script>
-
-<script id="template-unidade" type="text/template">
-    <ul id="UNIDADE" class="item-edit entity">
+    <script id="template-rows" type="text/template">
+        <ul class="<%= classe %>">
         <% _.each(items, function(item){ %>
-        <li>
-            <label for="UNIDADE-UNIDADE_CODIGO">ID</label>
-            <input type="text" id="UNIDADE-UNIDADE_CODIGO" value="<%= item.UNIDADE_CODIGO %>" placeholder="#"></input>
-        </li>
-        <li>
-            <label for="UNIDADE-UNIDADE_NOME">NOME</label>
-            <input type="text" id="UNIDADE-UNIDADE_NOME" value="<%= item.UNIDADE_NOME %>" placeholder="Nome"></input>
+        <li><%= item.data %></li>
+        <% }) %>
+        </ul>
+    </script>
+    <script id="template-row" type="text/template">
+        <ul class="row">
+        <% _.each(items, function(item){ %>
+            <li class="<%= item.class %>"><%= item.value %></li>
+        <% }) %>
+        </ul>
+    </script>
+    <script id="template-input" type="text/template">
+        <label for="<%= attribute.name %>"><%= item.name %></label>
+        <input id="<%= attribute.name %>" value="<%= attribute.value %>"></input>
+    </script>
+    <script id="template-UNIDADE-option" type="text/template">
+        <% _.each(items, function(item){ %>
+        <option title="<%= item.UNIDADE_NOME %>" value="<%= item.UNIDADE_CODIGO %>"><%= item.UNIDADE_CODIGO %></option>
+        <% }) %>
+    </script>
+    <script id="template-TIPO-option" type="text/template">
+        <% _.each(items, function(item){ %>
+        <option title="<%= item.TIPO_NOME %>" value="<%= item.TIPO_CODIGO %>"><%= item.TIPO_CODIGO %></option>
+        <% }) %>
+    </script>
+    <script id="template-RECURSO" type="text/template">
+        <ul id="RECURSO" class="item-edit entity">
+            <% _.each(items, function(item){ %>
+            <li class="attribute RECURSO_ID">
+            <label for="RECURSO-RECURSO_ID">R_ID</label>
+            <input type="text" id="RECURSO-RECURSO_ID" value="<%= item.RECURSO_ID %>">
+            <li class="attribute FORNECEDOR_ID">
+            <label for="RECURSO-FORNECEDOR_ID">F_ID</label>
+            <input type="text" id="RECURSO-FORNECEDOR_ID" value="<%= item.RECURSO_ID %>">
+            </li>
+            <li class="attribute NOME">
+            <label for="RECURSO-NOME">NOME</label>
+            <input type="text" id="RECURSO-NOME" value="<%= item.NOME %>">
+            </li>
+            <li class="attribute TIPO_CODIGO">
+            <label for="RECURSO-TIPO_CODIGO">TIPO</label>
+            <select id="RECURSO-TIPO_CODIGO" value="<%= item.TIPO_CODIGO %>"></select>
+            </li>
+            <li class="attribute UNIDADE_CODIGO">
+            <label for="RECURSO-UNIDADE_CODIGO">UNIDADE</label>
+            <select id="RECURSO-UNIDADE_CODIGO" value="<%= item.UNIDADE_CODIGO %>"></select>
+            </li>
+            <li class="attribute RECURSO_PRECO">
+            <label for="RECURSO-RECURSO_PRECO">PREÇO</label>
+            <input type="text" id="RECURSO-RECURSO_PRECO" value="<%= item.RECURSO_PRECO %>">
+            </li>
+            <li class="attribute DATA_ATUALIZADO">
+            <label for="RECURSO-DATA_ATUALIZADO">DATA</label>
+            <input type="date" id="RECURSO-DATA_ATUALIZADO" value="<%= item.DATA_ATUALIZADO %>">
+            </li>
+            <li class="attribute ">
+            <label for="RECURSO-USER">USER</label>
+            <input type="text" id="RECURSO-USER" value="<%= item.USER %>">
+            </li>
+            <% }) %>
+        </ul>
+        <div id="PRECO-mosaicos" class="mosaicos">
+            <ul class="related-items" style="padding: 7px;"></ul>
+        </div>
+        <div id="RENDIMENTO-mosaicos" class="mosaicos">
+            <ul class="related-items" style="padding: 7px;"></ul>
+        </div>
+    </script>
+    <script id="template-FORNECEDOR-CONTACTO" type="text/template">
+        <% _.each(contactos, function(contacto){ %>
+            <li class="CONTACTO">
+            <div style="text-align:left;">
+                <span style="vertical-align: middle;"><%= contacto.CONTACTO_DESCRITIVO %></span>
+                <img src="icons/16/close.png" class="eliminar" title="Eliminar">
+            </div>
+            <label><%= contacto.CONTACTO_NUMERO %></label>
+            </li>
+        <% }) %>
+    </script>
+    <script id="template-RECURSO-PRECO" type="text/template">
+        <% _.each(precos, function(preco){ %>
+            <li class="PRECO"
+                data-DATA="<%= preco.DATA %>"
+                data-RECURSO_ID="<%= preco.RECURSO_ID %>"
+                data-VALOR="<%= preco.VALOR %>"
+                data-FORNECEDOR_ID="<%= preco.FORNECEDOR_ID %>">
+            <div style="text-align:left;">
+                <input onchange="Frontgate.Apps('Fichas').clickedRadio(this);"
+                    type="radio" id="<%= preco.id %>"
+                    name="preco"
+                    style="vertical-align: middle; margin-right: 4px;">
+                <span style="vertical-align: middle;"><%= preco.fornecedor %> <%= preco.DATA %></span>
+                <img src="icons/16/close.png" class="eliminar" title="Eliminar">
+            </div>
+            <label for="<%= preco.id %>">
+            <span></span><%= preco.VALOR %> €
+            </label>
+            </li>
+        <% }) %>
+    </script>
+    <script id="template-RECURSO-RENDIMENTO" type="text/template">
+        <% _.each(rendimentos, function(rendimento){ %>
+        <li class="RENDIMENTO"
+            data-recurso_id="<%= rendimento.RECURSO_ID %>"
+            data-quantidade="<%= rendimento.QUANTIDADE %>"
+            data-preco_parcial="<%= rendimento.PRECO_PARCIAL %>">
+            <div style="text-align:left;">
+                <span style="vertical-align: middle;"><%= rendimento.NOME %></span>
+                <img src="icons/16/close.png" class="eliminar" title="Eliminar">
+            </div>
+            <label><%= rendimento.QUANTIDADE %> <%= rendimento.UNIDADE %> => <%= rendimento.PRECO_PARCIAL %> €</label>
         </li>
         <% }) %>
-    </ul>
-</script>
-
-<script id="template-tipo" type="text/template">
-    <ul id="UNIDADE" class="item-edit entity">
-        <% _.each(items, function(item){ %>
-        <li>
-            <label for="TIPO-TIPO_CODIGO">ID</label>
-            <input type="text" id="TIPO-TIPO_CODIGO" value="<%= item.TIPO_CODIGO %>" placeholder="#"></input>
-        </li>
-        <li>
-            <label for="TIPO-TIPO_NOME">NOME</label>
-            <input type="text" id="TIPO-TIPO_NOME" value="<%= item.TIPO_NOME %>" placeholder="Nome"></input>
-        </li>
-        <% }) %>
-    </ul>
-</script>
-
-<script type="text/javascript" src="script.js"></script>
+        <li style="text-align: right; border: none;">TOTAL: <%= total %> €</li>
+    </script>
+    <script id="template-FORNECEDOR" type="text/template">
+        <ul id="FORNECEDOR" class="item-edit entity">
+            <% _.each(items, function(item){ %>
+            <li>
+            <label for="FORNECEDOR-FORNECEDOR_ID">ID</label>
+            <input type="text" id="FORNECEDOR-FORNECEDOR_ID" value="<%= item.FORNECEDOR_ID %>" placeholder="#"></input>
+            </li>
+            <li>
+            <label for="FORNECEDOR-FORNECEDOR_NOME">NOME</label>
+            <input type="text" id="FORNECEDOR-FORNECEDOR_NOME" value="<%= item.FORNECEDOR_NOME %>" placeholder="Nome"></input>
+            </li>
+            <li>
+            <label for="FORNECEDOR-FORNECEDOR_MORADA">MORADA</label>
+            <input type="text" id="FORNECEDOR-FORNECEDOR_MORADA" value="<%= item.FORNECEDOR_MORADA %>" placeholder="Morada"></input>
+            </li>
+            <% }) %>
+        </ul>
+        <div id="CONTACTO-mosaicos" class="mosaicos">
+            <ul class="related-items" style="padding: 7px;"></ul>
+        </div>
+    </script>
+    <script id="template-UNIDADE" type="text/template">
+        <ul id="UNIDADE" class="item-edit entity">
+            <% _.each(items, function(item){ %>
+            <li>
+                <label for="UNIDADE-UNIDADE_CODIGO">ID</label>
+                <input type="text" id="UNIDADE-UNIDADE_CODIGO" value="<%= item.UNIDADE_CODIGO %>" placeholder="#">
+            </li>
+            <li>
+                <label for="UNIDADE-UNIDADE_NOME">NOME</label>
+                <input type="text" id="UNIDADE-UNIDADE_NOME" value="<%= item.UNIDADE_NOME %>" placeholder="Nome">
+            </li>
+            <% }) %>
+        </ul>
+    </script>
+    <script id="template-TIPO" type="text/template">
+        <ul id="UNIDADE" class="item-edit entity">
+            <% _.each(items, function(item){ %>
+            <li>
+                <label for="TIPO-TIPO_CODIGO">ID</label>
+                <input type="text" id="TIPO-TIPO_CODIGO" value="<%= item.TIPO_CODIGO %>" placeholder="#">
+            </li>
+            <li>
+                <label for="TIPO-TIPO_NOME">NOME</label>
+                <input type="text" id="TIPO-TIPO_NOME" value="<%= item.TIPO_NOME %>" placeholder="Nome">
+            </li>
+            <% }) %>
+        </ul>
+    </script>
+    <script type="text/javascript" src="script.js"></script>
 </body>
 </html>

@@ -67,12 +67,11 @@
             Fichas.fichas.recursos(url, function(json) {
                 //console.log(url, json);
                 //precosRecurso: function(el, id)
-                Fichas.fichas.precosRecurso("#PRECO-mosaicos ul", recurso_id);
+                Fichas.fichas.precosRecurso(recurso_id);
                 // voltar ao editor
                 $("#overlay").fadeOut();
             });
         },
-
         "#Recursos/adicionar-preco": function(route) {
             location.hash = "#Recursos";
 
@@ -143,30 +142,31 @@
             });
         }
     },
-
     FICHAS: {},
-
     templates: {},
-
     togglePanel: function(panel, flag) {
         if(flag) $(panel).fadeIn();
         else $(panel).fadeOut();
     },
-
-    toggleComposto: function(composto) {
+    toggleComposto: function(isCOM) {
         // composto
-        if(composto) {
+        if (isCOM) {
+            $("#adicionar-preco").hide();
+            $("#adicionar-rendimento").show();
             $("#PRECO-mosaicos").hide();
-            //$("#RENDIMENTO-mosaicos").show();
+            $("#RENDIMENTO-mosaicos").show();
             $('#RECURSO-TIPO_CODIGO').attr("disabled", true);
         }
         else {
-            //$("#RENDIMENTO-mosaicos").hide();
+            $("#adicionar-preco").show();
+            $("#adicionar-rendimento").hide();
+            $("#RENDIMENTO-mosaicos").hide();
             $("#PRECO-mosaicos").show();
             $('#RECURSO-TIPO_CODIGO option[value="COM"]').hide();
             $('#RECURSO-TIPO_CODIGO').attr("disabled", false);
         }
     },
+
     _fields: {
         RECURSO: {
             RECURSO_ID: "ID",
@@ -226,16 +226,16 @@
                     k++;
                 }
                 // adicionar linha
-                rows[i] = { data: _.template($("#row-template").html(), { items: items }) };
+                rows[i] = { data: _.template($("#template-row").html(), { items: items }) };
             }
 
             // table body
-            $(_.template($("#rows-template").html(), { items:rows, "classe": table }))
+            $(_.template($("#template-rows").html(), { items:rows, "classe": table }))
                 .addClass("table body").appendTo($(target));
 
             // table header
-            var header = _.template($("#row-template").html(), { items: lengths});
-            $(_.template($("#rows-template").html(), { items: [{ data: header }], "classe": table }))
+            var header = _.template($("#template-row").html(), { items: lengths});
+            $(_.template($("#template-rows").html(), { items: [{ data: header }], "classe": table }))
                 .addClass("table header").insertBefore($(target+" ul.table.body."+table));
 
             for(var x in lengths) {
@@ -377,21 +377,22 @@
             console.log(url, json);
             if(callback) callback(json);
             // atualizar lista de preços
-            Frontgate.Apps("Fichas").precosRecurso("#PRECO-mosaicos ul", rid);
+            Frontgate.Apps("Fichas").precosRecurso(rid);
         });
     },
-
+    precosEl: "#PRECO-mosaicos ul",
     // limpa os mosaicos de preços
-    _limparPrecosRecurso: function(el) {
+    limparPrecosRecurso: function () {
+        var el = this.precosEl;
         $(el).html("").append($('<button>').text("Adicionar Preço").click(function() {
             location.hash = "#Recursos/adicionar-preco";
         }));
     },
-
     // rende os mosaicos preços
-    _precosRecurso: function(el, items) {
+    _precosRecurso: function (items) {
+        var el = this.precosEl;
         // elemento preço a partir de template
-        var html = _.template($("#RECURSO-PRECO-template").html(), { precos: items });
+        var html = _.template($("#template-RECURSO-PRECO").html(), { precos: items });
 
         // preço do recurso fornecido
         $(el).append(html).children().each(function(index) {
@@ -422,13 +423,13 @@
             fichas.delete_PRECO(dataset.fornecedor_id, dataset.recurso_id);
         });
     },
-
     // obtém preços dum recurso
-    precosRecurso: function(el, id) {
+    precosRecurso: function(id) {
         var Fichas = this;
+        var el = this.precosEl;
 
         if(!id) {
-            Fichas._limparPrecosRecurso(el);
+            Fichas.limparPrecosRecurso();
             return;
         }
 
@@ -438,12 +439,46 @@
 
             // não tem preços
             if(!json.length) {
-                Fichas._limparPrecosRecurso(el);
+                Fichas.limparPrecosRecurso();
             }
             else {// console.log("A Render Preços");
                 $(el).html("");// limpar preços existente
-                Fichas._precosRecurso(el, json);// render preços
+                Fichas._precosRecurso(json);// render preços
             }
+        });
+    },
+
+    _rendimentosRecurso: function (ficha) {
+        var el = this.rendimentosEl;
+        var html = _.template($("#template-RECURSO-RENDIMENTO").html(), ficha);
+        $(el).append(html).children();
+    },
+    rendimentosEl: "#RENDIMENTO-mosaicos > ul",
+    rendimentosRecurso: function (id) {
+        
+        var el = this.rendimentosEl;
+        var fields = "RECURSO.NOME AS NOME, RENDIMENTO.RECURSO_ID AS RECURSO_ID, QUANTIDADE, RECURSO.UNIDADE_CODIGO AS UNIDADE, RENDIMENTO.QUANTIDADE*RECURSO.RECURSO_PRECO AS PRECO_PARCIAL";
+        var tables = "RECURSO, RENDIMENTO";
+        var query = "SELECT {fields} FROM {tables} WHERE RECURSO.RECURSO_ID = RENDIMENTO.RECURSO_ID AND RENDIMENTO.REC_RECURSO_ID = {id}";
+        query = query.replace("{fields}", fields).replace("{tables}", tables).replace("{id}", id);
+
+        var FICHAS = this;
+        var url = "query/" + query;
+        //console.log("url", url);
+        FICHAS.recursos(url, function (json) {
+            if (!json.length) {
+                $(el).html("<li>EMPTY</li>");
+                return;
+            }
+            var total = 0;
+            for (var i in json) {
+                json[i].QUANTIDADE = parseFloat(json[i].QUANTIDADE);
+                json[i].PRECO_PARCIAL = parseFloat(json[i].PRECO_PARCIAL);
+                total += json[i].PRECO_PARCIAL;
+            }
+            $(el).html("");
+            console.log({ recurso: id, rendimentos: json, total: Math.round(total * 100) / 100 });
+            FICHAS._rendimentosRecurso({ recurso: id, rendimentos: json, total: Math.round(total*100)/100 }); 
         });
     },
 
@@ -452,13 +487,11 @@
             location.hash = "#Fornecedores/adiciona-contacto";
         }));
     },
-
     _mostraContactos: function(el, items) {
         $(el).html("");
-        var html = _.template($("#FORNECEDOR-CONTACTO-template").html(), { contactos: items });
+        var html = _.template($("#template-FORNECEDOR-CONTACTO").html(), { contactos: items });
         $(el).append(html);
     },
-
     contactosFornecedor: function(el, id) {
         var fichas = this;
         if(!id) return this._limpaContactos(el);

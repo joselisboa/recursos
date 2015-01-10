@@ -137,7 +137,7 @@ window.Toolbox = function(data) {
             creator.attributes(creator.fields());
 
             // adicionar o template do editor ao div principal
-            var template = $(_.template($("#template-"+_entity.toLowerCase()).html(), {
+            var template = $(_.template($("#template-"+_entity).html(), {
                 items: [creator._novo()]
             }));
 
