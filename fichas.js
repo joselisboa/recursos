@@ -17,16 +17,19 @@
         });
 
         Frontgate.Apps("Fichas").data = fichas;
-
+        
+        // Retrieve existing user
+        var user = JSON.parse(localStorage.getItem("user"));
+        if (user != undefined) Frontgate.Apps("Fichas").start(user);//console.log("USER", user);
         // load current location route
-        Frontgate.router.route(location.hash);
+        //else Frontgate.router.route(location.hash);
     });
 
 })({
     toolbar: {
         name: "Fichas",
         items: [{
-                text: "Fichas de Rendimento"
+                html: '<img style="vertical-align: middle;" width="32" src="images/cash.png"> Fichas de Rendimento'
             },
             {
                 html: '<img style="vertical-align: middle;" src="icons/16/user.png"> <span id="user"></span>',
@@ -67,8 +70,8 @@
                 },
                 {
                     html: '<img src="icons/16/search.png"> Procurar',
-                    css: { cursor: "pointer" },
-                    attr: { href: "#Recursos/search/NOME" }
+                    css: { cursor: "pointer", display: "none" },
+                    attr: { href: "#Recursos/search/NOME", "class": "search" }
                 },
                 {
                     html: '<img src="icons/16/add.png"> Adicionar Preço',
@@ -92,8 +95,13 @@
                     attr: { href: "#Recursos/cancel" }
                 }]
             },
+            // callback de recursos
             callback: function(bar, toolbox) {
-                toolbox.entity("RECURSO", function() {
+                Frontgate.router.on("#Recursos/tabela", function(route) {
+                    toolbox.tabela();
+                });
+                
+                toolbox.entity("RECURSO", function () {
                     // estado inicial dos campos
                     toolbox.private(["RECURSO_PRECO", "FORNECEDOR_ID", "USER", "DATA_ATUALIZADO", "RECURSO_ID"])
                         .placeholder({ RECURSO_ID: "#", NOME: "Nome", RECURSO_PRECO: "€" });
@@ -117,10 +125,33 @@
                     // create event: select recurso on table row
                     toolbox.on("tableRows", function(rows) {
                         $(rows).find("ul.row").click(function(e) {
+                            var recurso = Fichas.fichas.recurso(this);
+
+                            var row = this;
+
                             // recurso é composto
-                            if($(this).find("li.RECURSO-TIPO_CODIGO").text() == "COM") {
+                            if (recurso.tipo_codigo == "COM") {
+
+                                // atualizar o preço
+                                var url = "recursivo/" + recurso.recurso_id;
+                                Fichas.fichas.recursos(url, function (json) {
+
+                                    if(!json.recurso) return console.error(url, json);
+
+                                    if (recurso.recurso_preco != json.recurso.RECURSO_PRECO && Math.abs(recurso.recurso_preco-json.recurso.RECURSO_PRECO) > 0.01) {
+                                        alert(recurso.recurso_preco +" != "+json.recurso.RECURSO_PRECO);
+                                        $(row).find("li.RECURSO-RECURSO_PRECO").text(json.recurso.RECURSO_PRECO);
+                                        var url = "execute/UPDATE RECURSO SET RECURSO_PRECO = "+json.recurso.RECURSO_PRECO+" WHERE RECURSO_ID = "+recurso.recurso_id;
+                                        Fichas.fichas.recursos(url, function (json) {
+                                            if (json !== true) console.error(url, json);
+                                            Frontgate.router.route("#Recursos/tabela");
+                                        });
+                                    }
+
+                                });
+
                                 // obter rendimentos
-                                Fichas.fichas.rendimentosRecurso($(this).find("li.RECURSO-RECURSO_ID").text());
+                                Fichas.fichas.rendimentosRecurso(recurso.recurso_id);
                                 Fichas.fichas.toggleComposto(true);
                             }
                             // recurso é simples
@@ -143,7 +174,8 @@
                         $("#adicionar-rendimento").hide();
                         $("#PRECO-mosaicos").hide();
                         $("#RENDIMENTO-mosaicos").hide();
-                        Fichas.fichas.limparPrecosRecurso();
+                        Fichas.fichas._limparPrecosRecurso();
+                        Fichas.fichas._limparRendimentosRecurso();
                         $(Fichas.fichas.rendimentosEl).html("<li>EMPTY</li>");
                         $('#RECURSO-TIPO_CODIGO').attr("disabled", false);
                         $('#RECURSO-TIPO_CODIGO option[value="COM"]').show();
@@ -151,11 +183,6 @@
 
                     // esconder privados; limpar editor; render tabela
                     toolbox.private(true).novo().tabela();
-
-                    // precos
-                    Fichas.fichas.precosRecurso();
-
-                    // rendimentos
 
                 });
             }

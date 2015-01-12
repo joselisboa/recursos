@@ -86,6 +86,17 @@ window.Toolbox = function(data) {
 
             // toolbox.on.table.row.click(function(){});
             if(creator.on.tableRows) creator.on.tableRows($el[1]);
+            
+            $el.find("li.tools img.loading").show().click(function () {
+                creator.tabela();
+            });
+
+            $el.find("li.tools img.search").show().click(function () {
+                //console.log(creator.bar.toolbox.items());
+                //creator.bar.toolbox.$bar.find("a.search").click();
+                location.hash = creator.bar.toolbox.$bar.find("a.search").attr("href");
+            });
+
 
             // evento click nas linhas (recursos) da tabela
             $el.show().not(".header").find("ul.row").click(function(e) {
@@ -387,12 +398,6 @@ window.Toolbox = function(data) {
     Frontgate.router.on(this.route + "/private", function(route) {
         location.hash = creator.route;
         creator.private();
-    });
-
-    // CANCEL (return from overlay)
-    Frontgate.router.on(this.route + "/cancel", function(route) {
-        location.hash = creator.route;
-        $("#overlay").fadeOut();
     });
 
     // DELETE

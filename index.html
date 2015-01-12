@@ -11,8 +11,10 @@
 <body>
     <div id="body"></div>
     <div id="overlay">
-        <div id="add-preco" style="margin-top: 25px;">
-            <h1 style="text-align: left; padding: 5px 10px;">adicionar preço</h1>
+        <div id="add-preco">
+            <h2 style="text-align: left; padding: 5px 10px; color: rgba(0, 0, 0, .66); font-family: 'Open Sans', Helvetica, Arial, 'Liberation Sans', sans-serif;">
+                PREÇO
+            </h2>
             <ul id="PRECO" style="text-align: left;" class="item-edit entity">
                 <li class="attribute">
                     <label style="width: 80px;" for="PRECO-RECURSO_ID">RECURSO</label>
@@ -32,24 +34,47 @@
                 </li>
             </ul>
             <ul class="related-items" style="padding: 7px;">
-                <li>
-                    <button class="ok" onclick="location.hash = '#Recursos/ok';">APLICAR</button>
-                    <button class="cancel" onclick="location.hash = '#Recursos/cancel';">CANCELAR</button>
+                <li style="padding: 0; margin:0; border: none;">
+                    <button class="ok" onclick="location.hash = '#Preco/ok';">OK</button>
+                    <button class="cancel" onclick="$('#overlay').fadeOut();">CANCELAR</button>
                 </li>
             </ul>
         </div>
-        <div id="add-rendimento" style="margin-top: 25px;">
+        <div id="add-rendimento">
+            <h2 style="text-align: left; padding: 5px 10px; color: rgba(0, 0, 0, .66); font-family: 'Open Sans', Helvetica, Arial, 'Liberation Sans', sans-serif;">
+                <img width="32" style="vertical-align: middle; opacity: .5" src="images/bill.png" />
+                RENDIMENTO
+            </h2>
             <ul id="RENDIMENTO" style="text-align: left;" class="item-edit entity">
-                <!-- RENDIMENTO REC_RECURSO_ID -->
-                <!-- RENDIMENTO RECURSO_ID -->
-                <!-- RENDIMENTO QUANTIDADE -->
-                <!-- RENDIMENTO PRECO_PARCIAL -->
-                <!-- RENDIMENTO DATA -->
-                <!-- RENDIMENTO USER -->
+                <li class="private attribute">
+                    <label style="width: 80px;" for="RENDIMENTO-REC_RECURSO_ID">COMPOSTO_ID</label>
+                    <input type="text" id="RENDIMENTO-REC_RECURSO_ID" value="" disabled>
+                </li>
+                <li class="attribute">
+                    <label style="width: 80px;" for="RENDIMENTO-COMPOSTO">COMPOSTO</label>
+                    <input type="text" id="RENDIMENTO-COMPOSTO" value="" disabled>
+                </li>
+                <li class="private attribute">
+                    <label style="width: 80px;" for="RENDIMENTO-RECURSO_ID">RECURSO_ID</label>
+                    <input id="RENDIMENTO-RECURSO_ID" value="" disabled placeholder="Recurso ID">
+                </li>
+                <li class="attribute">
+                    <label style="width: 80px;" for="RENDIMENTO-RECURSO">RECURSO</label>
+                    <input id="RENDIMENTO-RECURSO" value="" disabled placeholder="Recurso">
+                </li>
+                <li class="attribute">
+                    <label style="width: 80px;" for="RENDIMENTO-QUANTIDADE">QUANTIDADE</label>
+                    <input type="text" id="RENDIMENTO-QUANTIDADE" value="" placeholder="Quantidade">
+                </li>
+                <li class="attribute">
+                    <label style="width: 80px;" for="RENDIMENTO-PRECO_PARCIAL">VALOR</label>
+                    <input id="RENDIMENTO-PRECO_PARCIAL" value="" disabled>
+                </li>
+
             </ul>
             <ul class="related-items" style="padding: 7px;">
-                <li>
-                    <button class="ok" onclick="location.hash = '#Rendimento/ok';">APLICAR</button>
+                <li style="padding: 0; margin:0; border: none;">
+                    <button class="ok" onclick="location.hash = '#Rendimento/ok';">OK</button>
                     <button class="cancel" onclick="$('#overlay').fadeOut();">CANCELAR</button>
                 </li>
             </ul>
@@ -159,19 +184,29 @@
         <% }) %>
     </script>
     <script id="template-RECURSO-RENDIMENTO" type="text/template">
+        <li style="border: none;font-size: 16px; font-family: Consolas, monospace; font-weight: bold; padding-right: 24px; padding-left: 16px">Ficha de Rendimento</li>
         <% _.each(rendimentos, function(rendimento){ %>
         <li class="RENDIMENTO"
             data-recurso_id="<%= rendimento.RECURSO_ID %>"
             data-quantidade="<%= rendimento.QUANTIDADE %>"
             data-preco_parcial="<%= rendimento.PRECO_PARCIAL %>">
-            <div style="text-align:left;">
-                <span style="vertical-align: middle;"><%= rendimento.NOME %></span>
-                <img src="icons/16/close.png" class="eliminar" title="Eliminar">
+            <!--  border: solid 1px rgba(0,255,0,.1); -->
+            <div style="padding: 2px; text-align:left;">
+                <!--
+                <span style="vertical-align: middle; border: solid 1px rgba(255,0,0,.1);"><b><%= rendimento.NOME %></b> (<%= Math.round(rendimento.PRECO_PARCIAL/rendimento.QUANTIDADE*100)/100 %>€/<%= rendimento.UNIDADE %>)</span>
+                
+                   border: solid 1px rgba(255,0,0,.1);  -->
+                <img src="icons/16/close.png" class="eliminar" title="Eliminar" style="vertical-align: middle; margin-right: -10px; margin-top: 0px;">
+                <div style="white-space: nowrap;  margin: 0; padding: 0; font-family: Consolas, monospace; text-align: left; font-size: 14px;">
+                    <pre style="border: none; text-align: left; display: inline-block; float: right; font-weight: bold;margin: 0; margin-right: -4px;"><%= rendimento.PRECO_PARCIAL %> €</pre>
+                    <pre style="border: none; display: inline-block; text-align: right; margin-right: 34px;"><%= rendimento.QUANTIDADE %> <%= rendimento.UNIDADE %> <%= rendimento.NOME %></pre>
+                </div>
             </div>
-            <label><%= rendimento.QUANTIDADE %> <%= rendimento.UNIDADE %> => <%= rendimento.PRECO_PARCIAL %> €</label>
+
         </li>
         <% }) %>
-        <li style="text-align: right; border: none;">TOTAL: <%= total %> €</li>
+        <!--  border: solid 1px rgba(255,0,0,.1);  -->
+        <li style="text-align: right; border: none;font-size: 16px; font-family: Consolas, monospace; font-weight: bold; padding-right: 24px; padding-left: 16px"><span style="float:left;">Total</span><%= total %> €</li>
     </script>
     <script id="template-FORNECEDOR" type="text/template">
         <ul id="FORNECEDOR" class="item-edit entity">
