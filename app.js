@@ -8,7 +8,6 @@
 //
 
 (function(app) { app.init("Fichas"); })({
-    //
     init: function(name) {
         Frontgate.Apps(name, this);
         // set routes
@@ -16,14 +15,12 @@
             Frontgate.router.on(route, this.routes[route]);
         }
     },
-    //
     conf: function(url, callback) {
         $.getJSON(url, function(conf) {
             console.log("conf", conf);
             if(callback) callback(conf);
         });
     },
-    //
     start: function(user) {
         var app = this;
         app.conf("conf.json", function (conf) {
@@ -31,7 +28,6 @@
                 window.Fichas = new Toolbar(app.data);
         });
     },
-    //
     routes: {
         "#user/:user/:pw": function(route) {
             var app = Frontgate.Apps("Fichas");
@@ -45,6 +41,46 @@
 
             localStorage.setItem("user", JSON.stringify(route.attr));
             app.start(route.attr);
+        },
+        "#Contacto/ok": function(route) {
+            location.hash = "#Fornecedores";
+
+            // validar recurso
+            var fornecedor_id = $("#FORNECEDOR_CONTACTO-FORNECEDOR_ID").val();
+            if (!fornecedor_id) {
+                console.log("Fornecedor Inválido");
+                return;
+            }
+
+            // validar numero
+            var contacto_numero = $("#FORNECEDOR_CONTACTO-CONTACTO_NUMERO").val();
+            if (!contacto_numero) {
+                console.log("Numero Inválido");
+                return;
+            }
+
+            // validar numero
+            var contacto_descritivo = $("#FORNECEDOR_CONTACTO-CONTACTO_DESCRITIVO").val();
+            if (!contacto_descritivo) {
+                console.log("Descritivo Inválido");
+                return;
+            }
+
+            // INSERT RENDIMENTO
+            var sql = "INSERT INTO FORNECEDOR_CONTACTO (FORNECEDOR_ID, CONTACTO_NUMERO, CONTACTO_DESCRITIVO) VALUES ";
+            sql += "("+fornecedor_id+", '"+contacto_numero+"', '"+contacto_descritivo+"')";
+            var url = "execute/" + sql;
+            Fichas.fichas.recursos(url, function (json) {
+                // atualizar mosaicos RENDIMENTO
+                if (json === true) {
+                    // recarregar os contactos
+                    Fichas.fichas.contactosFornecedor(fornecedor_id);
+                }
+                else console.error(url, json);
+
+                // voltar ao editor
+                $("#overlay").fadeOut();
+            });
         },
         "#Preco/ok": function(route) {
             location.hash = "#Recursos";
@@ -125,10 +161,12 @@
             Fichas.fichas.recursos(url, function (json) {
                 // atualizar mosaicos RENDIMENTO
                 if (json === true) {
+                    // recarregar os rendimentos
                     Fichas.fichas.rendimentosRecurso(composto_id);
-                   Frontgate.router.route("#Recursos/tabela");
 
-                    // está a ser feito por trigger
+                    // recarregar a tabela
+                    Frontgate.router.route("#Recursos/tabela");
+
                     /*/ ATUALIZA O PREÇO DO RECURSO COMPOSTO
                     var subQuery = "(SELECT SUM(PRECO_PARCIAL) FROM RENDIMENTO WHERE REC_RECURSO_ID = "+composto_id+" GROUP BY REC_RECURSO_ID)";
                     var sql = "UPDATE RECURSO SET RECURSO_PRECO = "+subQuery+" WHERE RECURSO_ID = "+composto_id;
@@ -137,26 +175,45 @@
                         if (json === true) Frontgate.router.route("#Recursos/tabela");
                         else console.error(url, json);
                     });//*/
-
-                    // ATUALIZA TODOS OS RENDIMENTOS
-                    var url = "query/SELECT SUM(PRECO_PARCIAL) AS PRECO FROM RENDIMENTO WHERE REC_RECURSO_ID = "+composto_id+" GROUP BY REC_RECURSO_ID"
-                    Fichas.fichas.recursos(url, function (json) {
-                        if (json[0].PRECO) {
-                            console.info(url, json[0].PRECO);
-                            //Frontgate.router.route("#Recursos/tabela");
-                            var sql = "UPDATE RENDIMENTO SET PRECO_PARCIAL = QUANTIDADE * " + json[0].PRECO + " WHERE RECURSO_ID = " + composto_id;
-                            Fichas.fichas.recursos("execute/" + sql, function (json) {
-                                if (json !== true) console.error(sql, json);
-                            });
-                        }
-                        else console.error(url, json);
-                    });
                 }
                 else console.error(url, json);
+
                 // voltar ao editor
                 $("#overlay").fadeOut();
             });
 
+        },
+        "#Recursos/adicionar-contacto": function () {
+            location.hash = "#Fornecedores";
+            var dataset = $("#FORNECEDOR")[0].dataset;
+            //console.log("#FORNECEDOR", dataset);
+
+            var fornecedor_nome = $("#FORNECEDOR-FORNECEDOR_NOME").val();
+
+            // o fornecedor ainda não existe ...
+            if (!dataset.fornecedor_id) return console.log("O Fornecedor Ainda não Existe");
+
+            $("#FORNECEDOR_CONTACTO").find("li.private").hide();
+
+            // mosaicos de FORNECEDOR_CONTACTO do fornecedor
+            //var $contactos = $("#CONTACTO-mosaicos li.CONTACTO");
+
+            // prepara o editor do FORNECEDOR_CONTACTO
+            $("#FORNECEDOR_CONTACTO").attr("data-fornecedor_id", dataset.fornecedor_id);
+            $("#FORNECEDOR_CONTACTO").attr("data-contacto_numero", "");
+            $("#FORNECEDOR_CONTACTO").attr("data-contacto_descritivo", "");
+            //$("#FORNECEDOR_CONTACTO-CONTACTO_ID").val(id);
+            $("#FORNECEDOR_CONTACTO-FORNECEDOR_ID").val(dataset.fornecedor_id);
+            $("#FORNECEDOR_CONTACTO-FORNECEDOR").val(fornecedor_nome);
+            $("#FORNECEDOR_CONTACTO-CONTACTO_NUMERO").val("");
+            $("#FORNECEDOR_CONTACTO-CONTACTO_DESCRITIVO").val("");
+
+            // esconder todos os divs no overalay
+            $("#overlay div").hide();
+            // mostrar o editor de rendimentos
+            $("#add-contacto").show();
+            // mostrar o overlay
+            $("#overlay").fadeIn();
         },
         "#Recursos/adicionar-rendimento": function() {
             location.hash = "#Recursos";
@@ -199,7 +256,7 @@
             $("#RENDIMENTO-PRECO_PARCIAL").val(0);
             $("#RENDIMENTO-COMPOSTO").val(nome);
             $("#RENDIMENTO-RECURSO").val("");
-            
+
             // remover tabela existente
             $("#add-rendimento > ul.table.RECURSO").remove();
 
@@ -286,6 +343,8 @@
             // prencher o editor de PREÇO com dados do RECURSO
             $("#PRECO-RECURSO_ID").attr("data-recurso_id", id).val(nome);
 
+            $("#F1, #V1, #D1").val("");
+
             // limpar tabela existente
             $("#add-preco > ul.table.FORNECEDOR").remove();
 
@@ -336,9 +395,7 @@
             });
         }
     },
-    //
     FICHAS: {},
-    //
     templates: {},
     //?
     togglePanel: function(panel, flag) {
@@ -448,13 +505,12 @@
             $tools = $('<li class="tools">');
             $(target + " ul.table.header." + table).find("ul.row").append($tools);
 
-            $('<img class="search" title="procurar" src="icons/16/search.png">').appendTo($tools);
-            $('<img class="loading" title="carregar" src="icons/16/list.png">').appendTo($tools);
+            $('<img width="20" class="search" title="procurar" src="icons/1.png">').appendTo($tools);
+            $('<img width="20" class="loading" title="carregar" src="icons/3.png">').appendTo($tools);
 
             if(callback) callback($(selector));
         });
     },
-
     // cria a toolbox com as tabelas na base de dados
     tabelas: function($fichas) {
         var tabelas = this.FICHAS.Tables_in_FICHAS;
@@ -517,7 +573,6 @@
 
         Frontgate.router.route("#Tabelas");
     },
-
     // devolve a data de hoje no formato aaaa-mm-dd
     hoje: function() {
         var data = new Date(Date.now());
@@ -525,39 +580,18 @@
         //console.log("date", date);
         return date;
     },
-
     // faz chamada Ajax ao controlador da base de dados
     recursos: function(url, done) {
         url = this.API.href(url);
         $.ajaxSetup({ beforeSend: this.API.xhrAuth() });// controller auth
         $.ajax({ type: "GET", dataType: "json", url: url }).done(done);
     },
-
-    // ?
-    recursivo: function( json ) {
-        for(var i = 0; i < json.length; i++) {
-            var html = [];
-            var $li = $('<li>');
-            var k = 0;
-            for(var j in json[i]){
-                $li.attr('data-'+j, json[i][j]);
-                html[k++] = '<span class="'+j+'">'+json[i][j]+'</span>';
-            }
-            $li.click(function(){
-                Recursos.setValores(Recursos.valoresLi($(this)));
-                $("li.selected").removeClass("selected");
-                $(this).addClass("selected");
-            }).html(html.join(" | ")).appendTo("#RECURSOS");
-        }
-    },
-
     // API para o controlador da base de dados FICHAS
     api: function(auth, conf) {
         conf = conf || { hostname: "situs.lan", protocol: "https:", pathname: "/recursos" };
         this.API = Frontgate.location(conf);
         this.API.auth(auth);
     },
-
     //
     user: function() {
         return this.FICHAS["USER"];
@@ -593,11 +627,6 @@
     // limpa os mosaicos de preços
     _limparPrecosRecurso: function () {
         $(this._precosEl).html("<li>SEM PREÇOS</li>");
-        return;
-
-        $(this._precosEl).html("").append($('<button>').text("Adicionar Preço").click(function() {
-            location.hash = "#Recursos/adicionar-preco";
-        }));
     },
     // rende os mosaicos PREÇO
     _precosRecurso: function (items) {
@@ -664,6 +693,7 @@
     // rende os mosaicos dos rendimentos
     _rendimentosRecurso: function (ficha) {
         var html = _.template($("#template-RECURSO-RENDIMENTO").html(), ficha);
+
         $(this._rendimentosEl).html(html).find("img.eliminar").click(function (e) {
             var span = $(this).parent().find("span").text();
             var dataset = $(this).parent().parent()[0].dataset;
@@ -693,7 +723,7 @@
     },
     // limpa mosaicos dos rendimentos
     _limparRendimentosRecurso: function() {
-        $(this._rendimentosEl).html("<li>SEM RENDIMENTOS</li>");
+        $(this._rendimentosEl).html("<li>Sem Rendimento</li>");
     },
     // obtém rendimentos
     rendimentosRecurso: function (id) {
@@ -705,7 +735,7 @@
         if (1) {
             var url = "rendimento/" + id;
             FICHAS.recursos(url, function (json) {
-                console.log(url, json);
+                //console.log(url, json);
 
                 var total = json.recurso.RECURSO_PRECO, rendimentos = [];
 
@@ -740,25 +770,40 @@
     //=========
     // CONTACTO
     //=========
-    _limpaContactos: function(el) {
-        $(el).html("").append($('<button>').text("Adicionar Contacto").click(function() {
-            location.hash = "#Fornecedores/adiciona-contacto";
-        }));
+    _contactosEl: "#CONTACTO-mosaicos > ul",
+    _limpaContactos: function () {
+        $(this._contactosEl).html("<li>Sem Contacto</li>");
     },
-    _mostraContactos: function(el, items) {
-        $(el).html("");
+    // rende contactos
+    _mostraContactos: function(items) {
+
+        $(this._contactosEl).html("");
         var html = _.template($("#template-FORNECEDOR-CONTACTO").html(), { contactos: items });
-        $(el).append(html);
+
+        $(this._contactosEl).html(html).find("img.eliminar").click(function (e) {
+            var dataset = $(this).parent().parent()[0].dataset;
+            // confirmar eliminação ...
+            var msg = "Deseja eliminar o CONTACTO '"+dataset.contacto_numero+"' ("+dataset.contacto_descritivo+")?"
+            if (!confirm(msg)) return console.log("eliminação de CONTACTO cancelada");
+
+            var sql = "DELETE FROM FORNECEDOR_CONTACTO WHERE CONTACTO_ID = " + dataset.contacto_id;
+            Frontgate.Apps("Fichas").recursos("execute/"+sql, function (json) {
+                // atualizar lista de rendimentos
+                if (json !== true) console.error(sql, json);
+                Frontgate.Apps("Fichas").contactosFornecedor(dataset.fornecedor_id);
+            });
+        });
     },
-    contactosFornecedor: function(el, id) {
+    contactosFornecedor: function(id) {
+        var el = this._contactosEl;
         var fichas = this;
-        if(!id) return this._limpaContactos(el);
+        if(!id) return this._limpaContactos();
         var url = "contactos/" + id;
         fichas.recursos(url, function(json) {
             console.log(url, json);
             // não tem preços
-            if(json === null || !json.length) return fichas._limpaContactos(el);
-            else return fichas._mostraContactos(el, json);
+            if(json === null || !json.length) return fichas._limpaContactos();
+            else return fichas._mostraContactos(json);
         });
     },
 
@@ -782,7 +827,6 @@
 
         this.update_recurso_fid(preco.fornecedor_id, preco.valor, recurso);
     },
-
     // atualiza (fornecedor de) recurso 
     update_recurso_fid: function(fornecedor_id, valor, recurso) {
         //TODO atualizar o dataset de recurso ... ?
@@ -793,10 +837,13 @@
 
         var fichas = Frontgate.Apps("Fichas");
         var url = "recurso/preco/" + recurso.recurso_id + "/" + fornecedor_id + "/" + valor
-        console.log(">>> update_recurso_fid > url:", url);
         fichas.recursos(url, function(json) {
-            console.log(url, json);
-            if(json == false) console.log("Falha A ATUALIZAR preço");
+            if (typeof json == "string" && json.match(/^SQLSTATE/)) {
+                console.error(json);
+                console.log("FICHAS.update_recurso_fid url:", url);
+                return;
+            }
+            if (json == false) console.error("Falha A ATUALIZAR preço");
             else Fichas.toolbox("recursos").tabela();
         });
     }

@@ -17,7 +17,7 @@
         });
 
         Frontgate.Apps("Fichas").data = fichas;
-        
+
         // Retrieve existing user
         var user = JSON.parse(localStorage.getItem("user"));
         if (user != undefined) Frontgate.Apps("Fichas").start(user);//console.log("USER", user);
@@ -100,7 +100,7 @@
                 Frontgate.router.on("#Recursos/tabela", function(route) {
                     toolbox.tabela();
                 });
-                
+
                 toolbox.entity("RECURSO", function () {
                     // estado inicial dos campos
                     toolbox.private(["RECURSO_PRECO", "FORNECEDOR_ID", "USER", "DATA_ATUALIZADO", "RECURSO_ID"])
@@ -123,42 +123,64 @@
                     }));
 
                     // create event: select recurso on table row
-                    toolbox.on("tableRows", function(rows) {
-                        $(rows).find("ul.row").click(function(e) {
+                    toolbox.on("tableRows", function (rows) {
+
+                        var update_composto = function (row) {
+                            var recurso = Fichas.fichas.recurso(row);
+                            var url = "rendimento/" + recurso.recurso_id;
+                            Fichas.fichas.recursos(url, function (json) {
+
+                                if (!json.recurso) return console.error(url, json);
+
+                                if (recurso.recurso_preco != json.recurso.RECURSO_PRECO) {
+                                    //console.error(recurso.recurso_preco + " ---> " + json.recurso.RECURSO_PRECO);
+
+                                    //*/ UPDATE RECURSO PRECO
+                                    $(row).find("li.RECURSO-RECURSO_PRECO").text(json.recurso.RECURSO_PRECO).css("color", "green");;
+
+                                    /*/
+                                    var url = "execute/UPDATE RECURSO SET RECURSO_PRECO = " + json.recurso.RECURSO_PRECO + " WHERE RECURSO_ID = " + recurso.recurso_id;
+                                    Fichas.fichas.recursos(url, function (json) {
+                                        if (json !== true) console.error(url, json);
+                                        //Frontgate.router.route("#Recursos/tabela");
+                                    });//*/
+                                }
+                                else {
+                                    $(row).find("li.RECURSO-RECURSO_PRECO").css("color","");
+                                    //console.info(recurso.recurso_preco + " = " + json.recurso.RECURSO_PRECO);
+                                }
+                            });//*/
+                        };
+
+                        $(rows).children().each(function (i) {
+                            //console.log(i, this);
                             var recurso = Fichas.fichas.recurso(this);
-
-                            var row = this;
-
-                            // recurso é composto
+                            //-----------------
+                            // RECURSO COMPOSTO
+                            //-----------------
                             if (recurso.tipo_codigo == "COM") {
-
-                                // atualizar o preço
-                                var url = "recursivo/" + recurso.recurso_id;
-                                Fichas.fichas.recursos(url, function (json) {
-
-                                    if(!json.recurso) return console.error(url, json);
-
-                                    if (recurso.recurso_preco != json.recurso.RECURSO_PRECO && Math.abs(recurso.recurso_preco-json.recurso.RECURSO_PRECO) > 0.01) {
-                                        alert(recurso.recurso_preco +" != "+json.recurso.RECURSO_PRECO);
-                                        $(row).find("li.RECURSO-RECURSO_PRECO").text(json.recurso.RECURSO_PRECO);
-                                        var url = "execute/UPDATE RECURSO SET RECURSO_PRECO = "+json.recurso.RECURSO_PRECO+" WHERE RECURSO_ID = "+recurso.recurso_id;
-                                        Fichas.fichas.recursos(url, function (json) {
-                                            if (json !== true) console.error(url, json);
-                                            Frontgate.router.route("#Recursos/tabela");
-                                        });
-                                    }
-
+                                update_composto(this);
+                                $(this).click(function (e) {
+                                    var recurso = Fichas.fichas.recurso(this);
+                                    update_composto(this);
+                                    //alert(recurso.tipo_codigo);
+                                    // obter rendimentos
+                                    Fichas.fichas.rendimentosRecurso(recurso.recurso_id);
+                                    // alternar para composto
+                                    Fichas.fichas.toggleComposto(true);
                                 });
-
-                                // obter rendimentos
-                                Fichas.fichas.rendimentosRecurso(recurso.recurso_id);
-                                Fichas.fichas.toggleComposto(true);
                             }
-                            // recurso é simples
+                            //----------------
+                            // RECURSO SIMPLES
+                            //----------------
                             else {
-                                // obter os preços
-                                Fichas.fichas.precosRecurso($(this).find("li.RECURSO-RECURSO_ID").text());
-                                Fichas.fichas.toggleComposto(false);
+                                $(this).click(function (e) {
+                                    //alert(recurso.tipo_codigo);
+                                    // obter os preços
+                                    Fichas.fichas.precosRecurso($(this).find("li.RECURSO-RECURSO_ID").text());
+                                    // alternar de composto
+                                    Fichas.fichas.toggleComposto(false);
+                                });
                             }
                         });
                     });
@@ -176,7 +198,7 @@
                         $("#RENDIMENTO-mosaicos").hide();
                         Fichas.fichas._limparPrecosRecurso();
                         Fichas.fichas._limparRendimentosRecurso();
-                        $(Fichas.fichas.rendimentosEl).html("<li>EMPTY</li>");
+                        //$(Fichas.fichas.rendimentosEl).html("<li>EMPTY</li>");
                         $('#RECURSO-TIPO_CODIGO').attr("disabled", false);
                         $('#RECURSO-TIPO_CODIGO option[value="COM"]').show();
                     });
@@ -232,11 +254,20 @@
             // callback de Fornecedores
             callback: function(bar, toolbox) {
                 toolbox.entity("FORNECEDOR", function() {
-                    toolbox.on("tabela", function(el){
-                        Fichas.fichas.contactosFornecedor("#CONTACTO-mosaicos ul", $(el).find("li.FORNECEDOR-FORNECEDOR_ID").text());
+                    toolbox.on("tabela", function (el) {
+                        Fichas.fichas.contactosFornecedor($(el).find("li.FORNECEDOR-FORNECEDOR_ID").text());
                     }).on("novo", function(el) {
-                        Fichas.fichas._limpaContactos("#CONTACTO-mosaicos ul");
+                        Fichas.fichas._limpaContactos();
+                        $("#adicionar-contacto").hide();
+                        $("#CONTACTO-mosaicos").hide();
                     });
+
+                    toolbox.on("tableRows", function (rows) {
+                        $(rows).children().click(function () {
+                            $("#adicionar-contacto, #CONTACTO-mosaicos").show();
+                        });
+                    });
+
                     toolbox.private(["FORNECEDOR_ID"]).private(true).novo().tabela();
                 });
             }
