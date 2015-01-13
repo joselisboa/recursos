@@ -38,11 +38,19 @@
                     "font-size":"14px",
                     color:"rgba(0,0,0,.5)"
                 }
-        }],
+            },
+            {
+                text: "código no github",
+                attr: {
+                    id: "github",
+                    href: "https://github.com/joselisboa/recursos"
+                }
+            }],
         callback: function(bar, toolbar) {
             this.bar = bar;
             console.log('Frontgate.Apps("Fichas").user()', Frontgate.Apps("Fichas").user());
-            $("#user-a").parent().css("float","right");
+            $("#github").css({ "font-size":"12px","font-family":"monospace", "text-decoration":"underline" }).parent().css("float", "right");
+            $("#user-a").parent().css("float", "right");
         }
     },
     toolboxes: {
