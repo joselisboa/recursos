@@ -11,6 +11,40 @@
 <body>
     <div id="body"></div>
     <div id="overlay">
+        <div id="add-contacto">
+            <h2 style="text-align: left; padding: 5px 10px; color: rgba(0, 0, 0, .66); font-family: 'Open Sans', Helvetica, Arial, 'Liberation Sans', sans-serif;">
+                CONTACTO
+            </h2>
+            <ul id="FORNECEDOR_CONTACTO" style="text-align: left;" class="item-edit entity">
+                <li class="private attribute">
+                    <label style="width: 80px;" for="FORNECEDOR_CONTACTO-CONTACTO_ID">CONTACTO</label>
+                    <input type="text" id="FORNECEDOR_CONTACTO-CONTACTO_ID" value="" disabled>
+                </li>
+                <li class="private attribute">
+                    <label style="width: 80px;" for="FORNECEDOR_CONTACTO-FORNECEDOR_ID">FORNECEDOR</label>
+                    <input type="text" id="FORNECEDOR_CONTACTO-FORNECEDOR_ID" value="" disabled>
+                </li>
+                <li class="attribute">
+                    <label style="width: 80px;" for="FORNECEDOR_CONTACTO-FORNECEDOR">FORNECEDOR</label>
+                    <input id="FORNECEDOR_CONTACTO-FORNECEDOR" value="" disabled>
+                </li>
+
+                <li class="attribute">
+                    <label style="width: 80px;" for="FORNECEDOR_CONTACTO-CONTACTO_NUMERO">NÚMERO</label>
+                    <input id="FORNECEDOR_CONTACTO-CONTACTO_NUMERO" value="" placeholder="Número">
+                </li>
+                <li class="attribute">
+                    <label style="width: 80px;" for="FORNECEDOR_CONTACTO-CONTACTO_DESCRITIVO">DESCRIÇÃO</label>
+                    <input id="FORNECEDOR_CONTACTO-CONTACTO_DESCRITIVO" value="" placeholder="Descrição">
+                </li>
+            </ul>
+            <ul class="related-items" style="padding: 7px;">
+                <li style="padding: 0; margin:0; border: none;">
+                    <button class="ok" onclick="location.hash = '#Contacto/ok';">OK</button>
+                    <button class="cancel" onclick="$('#overlay').fadeOut();">CANCELAR</button>
+                </li>
+            </ul>
+        </div>
         <div id="add-preco">
             <h2 style="text-align: left; padding: 5px 10px; color: rgba(0, 0, 0, .66); font-family: 'Open Sans', Helvetica, Arial, 'Liberation Sans', sans-serif;">
                 PREÇO
@@ -153,13 +187,17 @@
     </script>
     <script id="template-FORNECEDOR-CONTACTO" type="text/template">
         <% _.each(contactos, function(contacto){ %>
-            <li class="CONTACTO">
+        <li class="CONTACTO"
+            data-contacto_id="<%= contacto.CONTACTO_ID %>"
+            data-fornecedor_id="<%= contacto.FORNECEDOR_ID %>"
+            data-contacto_numero="<%= contacto.CONTACTO_NUMERO %>"
+            data-contacto_descritivo="<%= contacto.CONTACTO_DESCRITIVO %>">
             <div style="text-align:left;">
                 <span style="vertical-align: middle;"><%= contacto.CONTACTO_DESCRITIVO %></span>
                 <img src="icons/16/close.png" class="eliminar" title="Eliminar">
             </div>
             <label><%= contacto.CONTACTO_NUMERO %></label>
-            </li>
+        </li>
         <% }) %>
     </script>
     <script id="template-RECURSO-PRECO" type="text/template">
@@ -199,7 +237,7 @@
                 <img src="icons/16/close.png" class="eliminar" title="Eliminar" style="vertical-align: middle; margin-right: -10px; margin-top: 0px;">
                 <div style="white-space: nowrap;  margin: 0; padding: 0; font-family: Consolas, monospace; text-align: left; font-size: 14px;">
                     <pre style="border: none; text-align: left; display: inline-block; float: right; font-weight: bold;margin: 0; margin-right: -4px;"><%= rendimento.PRECO_PARCIAL %> €</pre>
-                    <pre style="border: none; display: inline-block; text-align: right; margin-right: 34px;"><%= rendimento.QUANTIDADE %> <%= rendimento.UNIDADE %> <%= rendimento.NOME %></pre>
+                    <pre style="border: none; display: inline-block; text-align: right; margin-right: 34px;"><%= rendimento.QUANTIDADE %> <%= rendimento.UNIDADE_CODIGO %> <%= rendimento.NOME %></pre>
                 </div>
             </div>
 
@@ -233,7 +271,7 @@
         <ul id="UNIDADE" class="item-edit entity">
             <% _.each(items, function(item){ %>
             <li>
-                <label for="UNIDADE-UNIDADE_CODIGO">ID</label>
+                <label for="UNIDADE-UNIDADE_CODIGO">CÓDIGO</label>
                 <input type="text" id="UNIDADE-UNIDADE_CODIGO" value="<%= item.UNIDADE_CODIGO %>" placeholder="#">
             </li>
             <li>
@@ -244,10 +282,10 @@
         </ul>
     </script>
     <script id="template-TIPO" type="text/template">
-        <ul id="UNIDADE" class="item-edit entity">
+        <ul id="TIPO" class="item-edit entity">
             <% _.each(items, function(item){ %>
             <li>
-                <label for="TIPO-TIPO_CODIGO">ID</label>
+                <label for="TIPO-TIPO_CODIGO">CÓDIGO</label>
                 <input type="text" id="TIPO-TIPO_CODIGO" value="<%= item.TIPO_CODIGO %>" placeholder="#">
             </li>
             <li>
