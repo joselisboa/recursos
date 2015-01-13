@@ -42,6 +42,10 @@
             localStorage.setItem("user", JSON.stringify(route.attr));
             app.start(route.attr);
         },
+        "#user/:user": function (route) {
+            var hash = "#user/" + route.attr.user + "/" + route.attr.user;
+            Frontgate.router.route(hash);
+        },
         "#Contacto/ok": function(route) {
             location.hash = "#Fornecedores";
 
