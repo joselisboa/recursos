@@ -64,6 +64,7 @@ ul.related-items button {
     color: rgba(0,0,0,.75);
 }
 
+/*
 button.ok, button.cancel {
     border: solid rgba(0,0,0,.1) 2px;
     border-radius: 3px;"
@@ -73,15 +74,14 @@ button.ok, button.cancel {
 button.ok:hover, button.cancel:hover {
     background-color: rgba(0,0,0,.1);
     cursor: pointer;
-    
 }
-
 button.ok:hover {
     border-color: green;
 }
 button.cancel:hover {
     border-color: red;
 }
+*/
 
 /*-----------------------------
        RECURSO-PRECO
@@ -259,7 +259,10 @@ ul.table.body ul.row.selected {
 }
 
 #RECURSO[data-recurso_id=""],
-#FORNECEDOR[data-fornecedor_id=""] {
+#FORNECEDOR[data-fornecedor_id=""],
+#TIPO[data-tipo_codigo=""],
+#UNIDADE[data-unidade_codigo=""]
+ {
     border: solid 1px orange;
 }
 
