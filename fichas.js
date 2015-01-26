@@ -22,7 +22,7 @@
         var user = JSON.parse(localStorage.getItem("user"));
         if (user != undefined) Frontgate.Apps("Fichas").start(user);//console.log("USER", user);
         // load current location route
-        //else Frontgate.router.route(location.hash);
+        else Frontgate.router.route(location.hash);
     });
 
 })({
@@ -49,7 +49,7 @@
         callback: function(bar, toolbar) {
             this.bar = bar;
             console.log('Frontgate.Apps("Fichas").user()', Frontgate.Apps("Fichas").user());
-            $("#github").css({ "font-size":"12px","font-family":"monospace", "text-decoration":"underline" }).parent().css("float", "right");
+            $("#github").css({ "font-size":"12px","font-family":"monospace", "text-decoration":"underline" });
             $("#user-a").parent().css("float", "right");
         }
     },
