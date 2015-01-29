@@ -25,7 +25,8 @@
         var app = this;
         app.conf("conf.json", function (conf) {
              app.api(user, conf);
-                window.Fichas = new Toolbar(app.data);
+             // create "Recursos" app
+             window.Fichas = new Toolbar(app.data);
         });
     },
     routes: {
@@ -34,12 +35,12 @@
 
             if (typeof app.API != "undefined") {
                 if (app.API.basicAuth(route.attr) == app.API.auth()) return;
-                localStorage.setItem("user", JSON.stringify(route.attr));
+                //localStorage.setItem("user", JSON.stringify(route.attr));
                 location.reload();
                 return;
             }
 
-            localStorage.setItem("user", JSON.stringify(route.attr));
+            //localStorage.setItem("user", JSON.stringify(route.attr));
             app.start(route.attr);
         },
         "#user/:user": function (route) {
