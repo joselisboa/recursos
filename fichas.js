@@ -18,11 +18,22 @@
 
         Frontgate.Apps("Fichas").data = fichas;
 
-        // Retrieve existing user
-        var user = JSON.parse(localStorage.getItem("user"));
-        if (user != undefined) Frontgate.Apps("Fichas").start(user);//console.log("USER", user);
         // load current location route
+<<<<<<< HEAD
+        if(location.hash.match(/^#user\/(\w+)(\/(\w+))?$/)) {
+            Frontgate.router.route(location.hash);
+            return;
+        }
+
+        // Retrieve existing user
+        var user = JSON.parse(localStorage.getItem("fichas_user"));
+        if (user != null) {
+            //console.log("user", user);
+            Frontgate.Apps("Fichas").start(user);//console.log("USER", user);
+        }
+=======
         else Frontgate.router.route(location.hash);
+>>>>>>> 32b010280528bb3e3233deaac59171e599738262
     });
 
 })({
