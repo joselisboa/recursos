@@ -19,7 +19,6 @@
         Frontgate.Apps("Fichas").data = fichas;
 
         // load current location route
-<<<<<<< HEAD
         if(location.hash.match(/^#user\/(\w+)(\/(\w+))?$/)) {
             Frontgate.router.route(location.hash);
             return;
@@ -31,9 +30,7 @@
             //console.log("user", user);
             Frontgate.Apps("Fichas").start(user);//console.log("USER", user);
         }
-=======
         else Frontgate.router.route(location.hash);
->>>>>>> 32b010280528bb3e3233deaac59171e599738262
     });
 
 })({
