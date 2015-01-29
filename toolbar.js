@@ -501,7 +501,8 @@ window.Toolbar = function(data, callback) {
             tables: {}
         };
 
-        //console.log("this", this);
+        localStorage.setItem("fichas_user", JSON.stringify(self.fichas.API.basicAuth()));
+
         self.fichas.FICHAS = json;
         for(var toolbox in data.toolboxes) {
             var toolbox_data = data.toolboxes[toolbox];
